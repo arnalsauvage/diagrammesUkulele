@@ -33,7 +33,7 @@
            value="Dm7"
            onkeyup="if(event.keyCode===13) chercheAccordParNom()"
     >
-    <p role="img" aria-label="loupe" onclick="chercheAccordParNom()">🔍</p>
+    <span role="img" aria-label="loupe" onclick="chercheAccordParNom()">🔍</span>
 
     <div class="infobulle">
         <div class="infobulle-texte" id="aide_nomaccord" style="display: none;">
@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<label for="valeurs">Valeurs (x 0 à 12):</label>
+<label for="valeurs">Valeurs (0 à 9):</label>
 <input id="valeurs" maxlength="4" minlength="1" name="valeurs" size="4" type="text" value="2210"
        id = "loupeChercheAccordParValeurs"
        onkeyup="if(event.keyCode===13) chercheAccordParPosition()"
