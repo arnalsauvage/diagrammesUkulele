@@ -22,7 +22,8 @@
 <div>
     <label for="name">Nom de l'accord :</label>
     <img src="petite-info-bulle.png"
-         alt=""
+         alt="cherche accord"
+         id ="loupeChercheAccordParNom"
          class="infobulle-icone"
          width="16" height="15"
          onmouseover="afficher_aide(document.getElementById('aide_nomaccord'))"
@@ -32,7 +33,8 @@
            value="Dm7"
            onkeyup="if(event.keyCode===13) chercheAccordParNom()"
     >
-    <span onclick="chercheAccordParNom()">🔍</span>
+    <p role="img" aria-label="loupe" onclick="chercheAccordParNom()">🔍</p>
+
     <div class="infobulle">
         <div class="infobulle-texte" id="aide_nomaccord" style="display: none;">
             A B C D E F G pour la si do re mi fa sol , <br>b pour bémol, # pour dièse,
@@ -45,6 +47,7 @@
 
 <label for="valeurs">Valeurs (x 0 à 12):</label>
 <input id="valeurs" maxlength="4" minlength="1" name="valeurs" size="4" type="text" value="2210"
+       id = "loupeChercheAccordParValeurs"
        onkeyup="if(event.keyCode===13) chercheAccordParPosition()"
 >
 <span onclick="chercheAccordParPosition()">🔍</span>

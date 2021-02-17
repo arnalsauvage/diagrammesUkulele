@@ -25,6 +25,8 @@ window.addEventListener("load", startup, true);
     let toolCouleurRemplissage;
     let toolCouleurTrait;
     let toolCouleurGrille;
+    let loupeChercheAccordParNom;
+    let loupeChercheAccordParValeurs;
 
 function startup() {
 
@@ -35,6 +37,8 @@ function startup() {
     toolCouleurTrait.value = couleurTrait;
     toolCouleurGrille = document.querySelector("#couleurGrille");
     toolCouleurGrille.value = couleurGrille;
+    loupeChercheAccordParNom = document.getElementById("loupeChercheAccordParNom");
+    loupeChercheAccordParValeurs = document.getElementById("loupeChercheAccordParValeurs");
     changeTaille(taille);
 
 /// Mise à jour des données lors du clic sur le colorpicker
@@ -48,6 +52,8 @@ function startup() {
     canvas = document.getElementById('diagramme1');
     ctx = canvas.getContext('2d');
     dessineDiagramme();
+    loupeChercheAccordParNom.addEventListener("touchend", chercheAccordParNom(), false);
+    loupeChercheAccordParValeurs.addEventListener("touchend", chercheAccordParPosition(), false);
 }
 
 function changeTaille(nouvelleTaille) {
@@ -73,7 +79,6 @@ function updateAll(event) {
     couleurGrille = toolCouleurGrille.value;
     dessineDiagramme();
 }
-
 
 // Changement de la taille
 function outputUpdate(nouvelleTaille) {
@@ -277,11 +282,23 @@ function metLesDoigts(valeurs) {
         ctx.fillText(fretteDepart.toString(), margeGaucheGrille - (.35 * taille), margeHauteurGrille * 1.1);
         ctx.stroke();
     }
+
     for (let corde = 0; corde < 4; corde++) {
+        // Si la corde n'est pas jouée, on dessine une croix
         if (isNaN(valeurs[corde])) {
             dessinePoint(corde + 1, valeurs[corde]);
-        } else
-            dessinePoint(corde + 1, valeurs[corde] - fretteDepart);
+        } else{
+
+             if (valeurs[corde] == 0){
+                dessinePoint(corde + 1, 0);
+            }
+            if (fretteDepart >0)            {
+                dessinePoint(corde + 1, valeurs[corde] - fretteDepart + 1);
+            }
+            else             {
+                dessinePoint(corde + 1, valeurs[corde]);
+            }
+        }
     }
 }
 
@@ -320,7 +337,7 @@ function chercheAccordParPosition() {
     let position = document.getElementById("valeurs").value;
     //ex : tableauAccords["C"] = "0003";
     let saisieName = document.getElementById("name");
-    saisieName.value = "nom non trouvé";
+    saisieName.value = "non repertorié";
     for (let key in tableauAccords) {
         if (tableauAccords[key] === position) {
             saisieName.value = key;

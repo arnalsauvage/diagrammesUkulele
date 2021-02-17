@@ -28,7 +28,7 @@ tableauAccords["B"] = "4322";
 
 // Accords mineurs
 
-tableauAccords["Cm"] = "5333";
+tableauAccords["Cm"] = "0333";
 tableauAccords["C#m"] = "1104";
 tableauAccords["Dbm"] = "1104";
 tableauAccords["Dm"] = "2210";
@@ -98,7 +98,7 @@ tableauAccords["E7M"] = "1302";
 tableauAccords["F7M"] = "5500";
 tableauAccords["F#7M"] = "3524";
 tableauAccords["Gb7M"] = "3524";
-tableauAccords["G7M"] = "0333";
+tableauAccords["G7M"] = "0222";
 tableauAccords["G#7M"] = "1333";
 tableauAccords["Ab7M"] = "1333";
 tableauAccords["A7M"] = "1100";
