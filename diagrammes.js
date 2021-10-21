@@ -41,7 +41,7 @@ function startup() {
     loupeChercheAccordParValeurs = document.getElementById("loupeChercheAccordParValeurs");
     changeTaille(taille);
 
-/// Mise à jour des données lors du clic sur le colorpicker
+    /// Mise à jour des données lors du clic sur le colorpicker
 
     toolCouleurRemplissage.addEventListener("input", updateFirst, false);
     toolCouleurRemplissage.addEventListener("change", updateAll, false);
@@ -137,7 +137,7 @@ function dessineDiagramme() {
     // console.log("Nombre de cases nécessaires : " + maxCasesVerticales );
     pointsGrille = dessineGrille();
 
-    let fretteZeroDuDiagramme = calculeFretteDepart(document.getElementById("valeurs").value);
+    let fretteZeroDuDiagramme = calculecaseDepart(document.getElementById("valeurs").value) - 1;
 
     // Si la première frette est la frette zéro, on la met en gras!
     if (fretteZeroDuDiagramme === 0) {
@@ -232,7 +232,7 @@ function compteCasesNecessaires(valeurs) {
 }
 
 // trouve la frette la plus basse jouée dans l'accord
-function getValeurMin(valeurs) {
+function getValeurCaseMin(valeurs) {
     let valMin = 12;
     for (let compteur = 0; compteur < 4; compteur++) {
         if ((valeurs[compteur] > 0) && (valeurs[compteur] < valMin)) {
@@ -243,7 +243,7 @@ function getValeurMin(valeurs) {
 }
 
 // trouve la frette la plus hautee jouée dans l'accord
-function getValeurMax(valeurs) {
+function getValeurCaseMax(valeurs) {
     let valMax = 0;
     for (let compteur = 0; compteur < 4; compteur++) {
         if ((valeurs[compteur] > 0) && (valeurs[compteur] > valMax)) {
@@ -267,25 +267,31 @@ function ecritNomAccord(nom) {
     ctx.fillText(nom, margeGaucheGrille + 1.5 * taille, 2 * margeHauteurGrille / 3, taille * 3);
 }
 
-// Calcule la frette de départ qui semble le plus appropriée pour la position
-function calculeFretteDepart(valeurs) {
-    let fretteDepart = 0;
-    if ((getValeurMin(valeurs) > 1) && (getValeurMax(valeurs) > 4)) {
-        fretteDepart = getValeurMin(valeurs);
+// Calcule la case de départ qui semble le plus appropriée pour la position
+function calculecaseDepart(valeurs) {
+    let caseDepart = 1;
+    // Si l'utilisateur a choisi une caseDepartAuto
+    if (!document.getElementById("caseDepartAuto").checked) {
+        if ((getValeurCaseMin(valeurs) > 1) && (getValeurCaseMax(valeurs) > 5)) {
+            caseDepart = getValeurCaseMin(valeurs);
+        }
+    } else {
+        caseDepart = document.getElementById("caseDepart").value;
+        console.log("caseDepart : " + document.getElementById("caseDepart").value);
     }
-    return fretteDepart;
+    return caseDepart;
 }
 
 // pose les points qui doivent êtres joués sur le diagramme, ainsi que les autres détails
 function metLesDoigts(valeurs) {
     // Ecrit la frette de départ si ce n'est pas zéro
-    let fretteDepart = calculeFretteDepart(valeurs);
-    if (fretteDepart > 1) {
+    let caseDepart = calculecaseDepart(valeurs);
+    if (caseDepart > 1) {
 
         ctx.beginPath();
         ctx.font = 'bold ' + taille / 1.8 + 'px Verdana, Arial, serif';
         ctx.fillStyle = couleurTrait;
-        ctx.fillText(fretteDepart.toString(), margeGaucheGrille - (.35 * taille), margeHauteurGrille + 0.3 * taille);
+        ctx.fillText(caseDepart.toString(), margeGaucheGrille - (0.35 * taille), margeHauteurGrille + 0.3 * taille);
         ctx.stroke();
     }
 
@@ -298,8 +304,8 @@ function metLesDoigts(valeurs) {
             if (numeroFrette === 0) {
                 dessinePoint(corde + 1, 0);
             }
-            if (fretteDepart > 0) {
-                dessinePoint(corde + 1, numeroFrette - fretteDepart + 1);
+            if (caseDepart > 0) {
+                dessinePoint(corde + 1, numeroFrette - caseDepart + 1);
             } else {
                 dessinePoint(corde + 1, numeroFrette);
             }
@@ -389,8 +395,20 @@ function clicSurDiagramme(event) {
                 maNouvelleChaine += position.value.substr(i, 1);
             }
         }
-    console.log("nouvelle position : " + maNouvelleChaine);
-    position.value = maNouvelleChaine;
-    dessineDiagramme();
+        console.log("nouvelle position : " + maNouvelleChaine);
+        position.value = maNouvelleChaine;
+        dessineDiagramme();
+    }
+}
+
+// Gestion du masquage / affichage de la saisie de la frette de début
+function onCheckcaseDepartAuto() {
+    let saisieFretteDebut = document.getElementById("caseDepart");
+    console.log("caseDepartAuto.value = " + document.getElementById("caseDepartAuto").checked);
+    if (document.getElementById("caseDepartAuto").checked) {
+        saisieFretteDebut.style.display = 'inline';
+
+    } else {
+        saisieFretteDebut.style.display = 'none';
     }
 }
