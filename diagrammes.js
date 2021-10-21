@@ -1,33 +1,33 @@
-// TODO : ajouter la gestion des frettes > 9
-// TODO  : ajouter la guidance applicative
-// TODO  : cliquer pour choisir les notes
-// TODO : proposer plusieurs versions d'un accord
-// TODO : proposer de saisir une grille
+// ToDo  : ajouter une guidance applicative
+// ToDo : ajouter la gestion des frettes > 9
+// ToDo : proposer plusieurs versions d'un accord
 // ToDo : ajouter d'autres accords
 // ToDo : exporter en masse les fichiers png de tous les accords possibles
 
 window.addEventListener("load", startup, true);
+document.addEventListener("click", clicSurDiagramme);
 
-    let canvas;
-    let ctx;
-    let bGrilleTordue = true;
-    let margeGaucheGrille = 0;
-    let margeHauteurGrille = 0;
-    let taille = 50;
-    let epaisseurLigne = 0;
+let canvas;
+let ctx;
+let bGrilleTordue = true;
+let margeGaucheGrille = 0;
+let margeHauteurGrille = 0;
+let taille = 50;
+let epaisseurLigne = 0;
 //const couleurTrait = '#4488EE';
-    let couleurTrait = '#000000';
-    let couleurRemplissage = '#ff4444';
-    let couleurGrille = '#444444';
-    let couleurFond = 'rgba(255	,255,255,1)';
-    let tailleGrillex = 4;
-    let tailleGrilley = 6;
-    let toolCouleurRemplissage;
-    let toolCouleurTrait;
-    let toolCouleurGrille;
-    let loupeChercheAccordParNom;
-    let loupeChercheAccordParValeurs;
+let couleurTrait = '#000000';
+let couleurRemplissage = '#ff4444';
+let couleurGrille = '#444444';
+let couleurFond = 'rgba(255	,255,255,1)';
+let tailleGrillex = 4;
+let tailleGrilley = 6;
+let toolCouleurRemplissage;
+let toolCouleurTrait;
+let toolCouleurGrille;
+let loupeChercheAccordParNom;
+let loupeChercheAccordParValeurs;
 
+// Initialisation
 function startup() {
 
     canvas = document.getElementById('diagramme1');
@@ -52,10 +52,11 @@ function startup() {
     canvas = document.getElementById('diagramme1');
     ctx = canvas.getContext('2d');
     dessineDiagramme();
-    loupeChercheAccordParNom.addEventListener("touchend", chercheAccordParNom(), false);
-    loupeChercheAccordParValeurs.addEventListener("touchend", chercheAccordParPosition(), false);
+    loupeChercheAccordParNom.addEventListener("touchend", chercheAccordParNom, false);
+    loupeChercheAccordParValeurs.addEventListener("touchend", chercheAccordParPosition, false);
 }
 
+// Change la taille du diagramme : la taille en pixels d'un carré du diagramme
 function changeTaille(nouvelleTaille) {
     taille = nouvelleTaille;
     epaisseurLigne = taille / 12;
@@ -88,7 +89,6 @@ function outputUpdate(nouvelleTaille) {
 }
 
 // Dessine la grille du diagramme, légèrement irrégulière
-
 function dessineGrille() {
     let maxCasesVerticales = tailleGrilley - 1;
     let pointsGrille = [];
@@ -130,6 +130,7 @@ function dessineGrille() {
     return pointsGrille;
 }
 
+// Dessine le diagramme complet
 function dessineDiagramme() {
     blank();
     let pointsGrille;
@@ -170,6 +171,7 @@ function dessineDiagramme() {
     ctx.stroke();
 }
 
+// dessine un point sur le diagramme
 function dessinePoint(nCorde, nfrette) {
     ctx.beginPath();
     ctx.strokeStyle = couleurTrait;
@@ -251,11 +253,13 @@ function getValeurMax(valeurs) {
     return (valMax);
 }
 
+// Vide le diagramme
 function blank() {
     ctx.fillStyle = couleurFond;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
+// Ecrit le nom de l'accord au dessus du diagramme
 function ecritNomAccord(nom) {
     ctx.font = 'bold ' + taille + 'px Verdana, Arial, serif';
     ctx.fillStyle = couleurTrait;
@@ -263,6 +267,7 @@ function ecritNomAccord(nom) {
     ctx.fillText(nom, margeGaucheGrille + 1.5 * taille, 2 * margeHauteurGrille / 3, taille * 3);
 }
 
+// Calcule la frette de départ qui semble le plus appropriée pour la position
 function calculeFretteDepart(valeurs) {
     let fretteDepart = 0;
     if ((getValeurMin(valeurs) > 1) && (getValeurMax(valeurs) > 4)) {
@@ -271,15 +276,16 @@ function calculeFretteDepart(valeurs) {
     return fretteDepart;
 }
 
+// pose les points qui doivent êtres joués sur le diagramme, ainsi que les autres détails
 function metLesDoigts(valeurs) {
     // Ecrit la frette de départ si ce n'est pas zéro
     let fretteDepart = calculeFretteDepart(valeurs);
     if (fretteDepart > 1) {
 
         ctx.beginPath();
-        ctx.font = 'bold ' + taille / 2 + 'px Verdana, Arial, serif';
+        ctx.font = 'bold ' + taille / 1.8 + 'px Verdana, Arial, serif';
         ctx.fillStyle = couleurTrait;
-        ctx.fillText(fretteDepart.toString(), margeGaucheGrille - (.35 * taille), margeHauteurGrille * 1.1);
+        ctx.fillText(fretteDepart.toString(), margeGaucheGrille - (.35 * taille), margeHauteurGrille + 0.3 * taille);
         ctx.stroke();
     }
 
@@ -287,16 +293,15 @@ function metLesDoigts(valeurs) {
         // Si la corde n'est pas jouée, on dessine une croix
         if (isNaN(valeurs[corde])) {
             dessinePoint(corde + 1, valeurs[corde]);
-        } else{
-
-             if (valeurs[corde] == 0){
+        } else {
+            let numeroFrette = parseInt(valeurs[corde]);
+            if (numeroFrette === 0) {
                 dessinePoint(corde + 1, 0);
             }
-            if (fretteDepart >0)            {
-                dessinePoint(corde + 1, valeurs[corde] - fretteDepart + 1);
-            }
-            else             {
-                dessinePoint(corde + 1, valeurs[corde]);
+            if (fretteDepart > 0) {
+                dessinePoint(corde + 1, numeroFrette - fretteDepart + 1);
+            } else {
+                dessinePoint(corde + 1, numeroFrette);
             }
         }
     }
@@ -318,6 +323,8 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
+// Propose de transformer en lien de download l'élément el
+// pour télécharger le diagramme affiché avec le nom d'accord comme nom de fichier
 function download_img(el) {
     let lienDownload = document.getElementById("download");
     let nomAccord = document.getElementById("name").value;
@@ -325,6 +332,7 @@ function download_img(el) {
     el.href = canvas.toDataURL("image/jpg");
 }
 
+// Affiche la position et le diagramme pour l'accord portant le nom saisi dans le champ de saisie
 function chercheAccordParNom() {
     let accord = document.getElementById("name").value;
     let saisieValeurs = document.getElementById("valeurs");
@@ -332,6 +340,7 @@ function chercheAccordParNom() {
     dessineDiagramme();
 }
 
+// Cherche le nom de l'accord avec la position saisie
 function chercheAccordParPosition() {
     console.log("coucou");
     let position = document.getElementById("valeurs").value;
@@ -347,6 +356,7 @@ function chercheAccordParPosition() {
     dessineDiagramme();
 }
 
+// Tire un accord au hasard dans la bibliothèque !
 function setAccordAuHasard() {
     const accords = Object.keys(tableauAccords);
     let nombreDaccords = accords.length;
@@ -355,4 +365,32 @@ function setAccordAuHasard() {
     saisieName.value = accords[numeroAccord];
     // console.log("Saisiename : " + accords[numeroAccord]);
     chercheAccordParNom();
+}
+
+// Permet de changer la position quand on clique sur le diagramme
+function clicSurDiagramme(event) {
+    // console.log("Clic sur " + event.clientX + " y : " + event.clientY);
+    let relatifX = event.clientX - margeGaucheGrille - document.getElementById("diagramme1").getBoundingClientRect().left;
+    let relatifY = event.clientY - margeHauteurGrille - document.getElementById("diagramme1").getBoundingClientRect().top;
+
+    relatifX = Math.round(relatifX / taille);
+    relatifY = Math.round(relatifY / taille + 0.5);
+    // console.log("Clic sur relatif " + relatifX + " y : " + relatifY);
+
+    if (relatifX < 4 && relatifY < 6) {
+        let position = document.getElementById("valeurs");
+        if (relatifX < 4)
+            position.value[relatifX] = relatifY;
+        let maNouvelleChaine = "";
+        for (let i = 0; i < 4; i++) {
+            if (i === relatifX) {
+                maNouvelleChaine += relatifY;
+            } else {
+                maNouvelleChaine += position.value.substr(i, 1);
+            }
+        }
+    console.log("nouvelle position : " + maNouvelleChaine);
+    position.value = maNouvelleChaine;
+    dessineDiagramme();
+    }
 }

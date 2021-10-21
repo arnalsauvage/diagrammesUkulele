@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Diagrammes ukulélé Top 5</title>
+    <title>Grille ukulélé Top 5</title>
     <meta charset='utf-8'>
     <link href='style.css' rel='stylesheet'>
     <script async src='diagrammes.js'></script>
@@ -17,6 +17,8 @@
 </head>
 <body>
 <h1>Atelier diagrammes ukulélé Top 5</h1>
+<a href="pageAccords.htm"> aller à la page grille</a>
+<br>
 <canvas height=330 id='diagramme1' width=190></canvas>
 
 <div>
@@ -47,10 +49,11 @@
 
 <label for="valeurs">Valeurs (0 à 9):</label>
 <input id="valeurs" maxlength="4" minlength="1" name="valeurs" size="4" type="text" value="2210"
-       id = "loupeChercheAccordParValeurs"
        onkeyup="if(event.keyCode===13) chercheAccordParPosition()"
 >
-<span onclick="chercheAccordParPosition()">🔍</span>
+<span onclick="chercheAccordParPosition()"
+       id = "loupeChercheAccordParValeurs"
+>🔍</span>
 <button id="button-dessine" onclick="dessineDiagramme(ctx, 4, 6, 50)">dessine</button>
 <div>
     <input id="couleurTrait" name="couleurTrait" type="color"
