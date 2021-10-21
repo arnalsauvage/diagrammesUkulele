@@ -42,10 +42,10 @@
     <input id="valeurs" maxlength="4" minlength="1" name="valeurs" size="4" type="text" value="2210" onkeyup="if(event.keyCode===13) chercheAccordParPosition()">
     <span onclick="chercheAccordParPosition()" id="loupeChercheAccordParValeurs">🔍</span>
     <button id="button-dessine" onclick="dessineDiagramme();">dessine</button>
+    <br>
     <label for="caseDepart">Case de départ</label>
-    <input type="checkbox" id="caseDepartAuto" value="checked" onchange="onCheckcaseDepartAuto();">
-    <input id="caseDepart" type="number" min=1 max=12 value="1" onclick="dessineDiagramme();">
-
+    <input type="checkbox" id="caseDepartAuto" onchange="onCheckcaseDepartAuto();dessineDiagramme();">
+    <input id="caseDepart" type="number" min=1 max=12 value="1" style="display:none" onclick="dessineDiagramme();">
 
     <div>
         <input id="couleurTrait" name="couleurTrait" type="color" value="#012345">
@@ -60,6 +60,11 @@
     <div>
         <input id="couleurRemplissage" name="couleurRemplissage" type="color" value="#e66465">
         <label for="couleurRemplissage">couleur de remplissage</label>
+    </div>
+
+    <div>
+        <input id="couleurReperes" name="couleurReperes" type="color" value="#FF9090">
+        <label for="couleurReperes">couleur des repères sur le manche</label>
     </div>
 
     <div class="row">

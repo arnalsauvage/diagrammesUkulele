@@ -14,14 +14,15 @@ let margeGaucheGrille = 0;
 let margeHauteurGrille = 0;
 let taille = 50;
 let epaisseurLigne = 0;
-//const couleurTrait = '#4488EE';
 let couleurTrait = '#000000';
 let couleurRemplissage = '#ff4444';
+let couleurReperes = '#ffb0b0';
 let couleurGrille = '#444444';
 let couleurFond = 'rgba(255	,255,255,1)';
 let tailleGrillex = 4;
 let tailleGrilley = 6;
 let toolCouleurRemplissage;
+let toolCouleurReperes;
 let toolCouleurTrait;
 let toolCouleurGrille;
 let loupeChercheAccordParNom;
@@ -33,6 +34,10 @@ function startup() {
     canvas = document.getElementById('diagramme1');
     toolCouleurRemplissage = document.querySelector("#couleurRemplissage");
     toolCouleurRemplissage.value = couleurRemplissage;
+    toolCouleurReperes = document.querySelector("#couleurReperes");
+    toolCouleurReperes.value = couleurReperes;
+    toolCouleurReperes = document.querySelector("#couleurReperes");
+    toolCouleurReperes.value = couleurReperes;
     toolCouleurTrait = document.querySelector("#couleurTrait");
     toolCouleurTrait.value = couleurTrait;
     toolCouleurGrille = document.querySelector("#couleurGrille");
@@ -45,6 +50,8 @@ function startup() {
 
     toolCouleurRemplissage.addEventListener("input", updateFirst, false);
     toolCouleurRemplissage.addEventListener("change", updateAll, false);
+    toolCouleurReperes.addEventListener("input", updateFirst, false);
+    toolCouleurReperes.addEventListener("change", updateAll, false);
     toolCouleurTrait.addEventListener("input", updateFirst, false);
     toolCouleurTrait.addEventListener("change", updateAll, false);
     toolCouleurGrille.addEventListener("input", updateFirst, false);
@@ -69,6 +76,7 @@ function changeTaille(nouvelleTaille) {
 // Appelé lors d'une mise à jour d'un outil
 function updateFirst(event) {
     couleurRemplissage = toolCouleurRemplissage.value;
+    couleurReperes = toolCouleurReperes.value;
     couleurTrait = toolCouleurTrait.value;
     couleurGrille = toolCouleurGrille.value;
     dessineDiagramme();
@@ -76,6 +84,7 @@ function updateFirst(event) {
 
 function updateAll(event) {
     couleurRemplissage = toolCouleurRemplissage.value;
+    couleurReperes = toolCouleurReperes.value;
     couleurTrait = toolCouleurTrait.value;
     couleurGrille = toolCouleurGrille.value;
     dessineDiagramme();
@@ -162,12 +171,68 @@ function dessineDiagramme() {
         }
         ctx.stroke();
     }
+
+    // Dessine les repères de frettes 5, 7, 10, 12, 15
+    const reperesSimples = [5, 7, 10, 15];
+    for (const numeroFretteRepere of reperesSimples) {
+        if ((numeroFretteRepere >= fretteZeroDuDiagramme) && (numeroFretteRepere <= fretteZeroDuDiagramme + 5)) {
+            repereSimple(numeroFretteRepere, fretteZeroDuDiagramme);
+        }
+    }
+
+    if ((fretteZeroDuDiagramme >= 8) && (fretteZeroDuDiagramme <= 13)) {
+        repereDouble(12 - fretteZeroDuDiagramme);
+    }
     ctx.beginPath();
     ctx.strokeStyle = couleurTrait; //Nuance de noir
     ctx.lineWidth = epaisseurLigne;
     ctx.strokeStyle = couleurRemplissage;
     metLesDoigts(document.getElementById("valeurs").value);
     ecritNomAccord(document.getElementById("name").value);
+    ctx.stroke();
+}
+
+function repereSimple(numeroFretteDuRepere, fretteZeroDuDiagramme) {
+    ctx.beginPath();
+    ctx.lineWidth = epaisseurLigne;
+    ctx.strokeStyle = couleurReperes;
+    ctx.fillStyle = couleurReperes;
+    let caseDuPoint = numeroFretteDuRepere - fretteZeroDuDiagramme;
+
+    ctx.lineWidth = taille / 30;
+    let monx = margeGaucheGrille + (1.5) * taille;
+    let mony;
+    // Corde jouée
+    if (caseDuPoint > 0) {
+        mony = margeHauteurGrille + caseDuPoint * taille - taille / 2;
+        ctx.arc(monx, mony, taille / 6, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    ctx.stroke();
+}
+
+
+function repereDouble(numeroFretteDuRepere) {
+    ctx.lineWidth = epaisseurLigne;
+    ctx.strokeStyle = couleurReperes;
+    ctx.fillStyle = couleurReperes;
+    let caseDuPoint = numeroFretteDuRepere;
+
+    ctx.beginPath();
+    ctx.lineWidth = taille / 30;
+    let monx = margeGaucheGrille + (0.5) * taille;
+    let mony;
+    mony = margeHauteurGrille + caseDuPoint * taille - taille / 2;
+    ctx.arc(monx, mony, taille / 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.lineWidth = taille / 30;
+    monx = margeGaucheGrille + (2.5) * taille;
+    mony = margeHauteurGrille + caseDuPoint * taille - taille / 2;
+    ctx.arc(monx, mony, taille / 6, 0, 2 * Math.PI);
+    ctx.fill();
     ctx.stroke();
 }
 
