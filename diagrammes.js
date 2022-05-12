@@ -68,7 +68,7 @@ function changeTaille(nouvelleTaille) {
     taille = nouvelleTaille;
     epaisseurLigne = taille / 12;
     margeHauteurGrille = taille * 70 / 50;
-    margeGaucheGrille = taille / 2;
+    margeGaucheGrille = taille * 2 / 3;
     canvas.width = 4 * taille;
     canvas.height = 7 * taille;
 }
@@ -352,11 +352,11 @@ function metLesDoigts(valeurs) {
     // Ecrit la frette de départ si ce n'est pas zéro
     let caseDepart = calculecaseDepart(valeurs);
     if (caseDepart > 1) {
-
+        console.log("coucou");
         ctx.beginPath();
         ctx.font = 'bold ' + taille / 1.8 + 'px Verdana, Arial, serif';
         ctx.fillStyle = couleurTrait;
-        ctx.fillText(caseDepart.toString(), margeGaucheGrille - (0.35 * taille), margeHauteurGrille + 0.3 * taille);
+        ctx.fillText(caseDepart.toString(), margeGaucheGrille - (0.45 * taille), margeHauteurGrille + 0.7 * taille);
         ctx.stroke();
     }
 
