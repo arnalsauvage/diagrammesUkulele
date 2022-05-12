@@ -1,38 +1,43 @@
-// TODO : ajouter la gestion des frettes > 9
-// TODO  : ajouter la guidance applicative
-// TODO  : cliquer pour choisir les notes
-// TODO : proposer plusieurs versions d'un accord
-// TODO : proposer de saisir une grille
+// ToDo  : ajouter une guidance applicative
+// ToDo : ajouter la gestion des frettes > 9
+// ToDo : proposer plusieurs versions d'un accord
 // ToDo : ajouter d'autres accords
 // ToDo : exporter en masse les fichiers png de tous les accords possibles
 
 window.addEventListener("load", startup, true);
+document.addEventListener("click", clicSurDiagramme);
 
-    let canvas;
-    let ctx;
-    let bGrilleTordue = true;
-    let margeGaucheGrille = 0;
-    let margeHauteurGrille = 0;
-    let taille = 50;
-    let epaisseurLigne = 0;
-//const couleurTrait = '#4488EE';
-    let couleurTrait = '#000000';
-    let couleurRemplissage = '#ff4444';
-    let couleurGrille = '#444444';
-    let couleurFond = 'rgba(255	,255,255,1)';
-    let tailleGrillex = 4;
-    let tailleGrilley = 6;
-    let toolCouleurRemplissage;
-    let toolCouleurTrait;
-    let toolCouleurGrille;
-    let loupeChercheAccordParNom;
-    let loupeChercheAccordParValeurs;
+let canvas;
+let ctx;
+let bGrilleTordue = true;
+let margeGaucheGrille = 0;
+let margeHauteurGrille = 0;
+let taille = 50;
+let epaisseurLigne = 0;
+let couleurTrait = '#000000';
+let couleurRemplissage = '#ff4444';
+let couleurReperes = '#ffb0b0';
+let couleurGrille = '#444444';
+let couleurFond = 'rgba(255	,255,255,1)';
+let tailleGrillex = 4;
+let tailleGrilley = 6;
+let toolCouleurRemplissage;
+let toolCouleurReperes;
+let toolCouleurTrait;
+let toolCouleurGrille;
+let loupeChercheAccordParNom;
+let loupeChercheAccordParValeurs;
 
+// Initialisation
 function startup() {
 
     canvas = document.getElementById('diagramme1');
     toolCouleurRemplissage = document.querySelector("#couleurRemplissage");
     toolCouleurRemplissage.value = couleurRemplissage;
+    toolCouleurReperes = document.querySelector("#couleurReperes");
+    toolCouleurReperes.value = couleurReperes;
+    toolCouleurReperes = document.querySelector("#couleurReperes");
+    toolCouleurReperes.value = couleurReperes;
     toolCouleurTrait = document.querySelector("#couleurTrait");
     toolCouleurTrait.value = couleurTrait;
     toolCouleurGrille = document.querySelector("#couleurGrille");
@@ -41,10 +46,12 @@ function startup() {
     loupeChercheAccordParValeurs = document.getElementById("loupeChercheAccordParValeurs");
     changeTaille(taille);
 
-/// Mise à jour des données lors du clic sur le colorpicker
+    /// Mise à jour des données lors du clic sur le colorpicker
 
     toolCouleurRemplissage.addEventListener("input", updateFirst, false);
     toolCouleurRemplissage.addEventListener("change", updateAll, false);
+    toolCouleurReperes.addEventListener("input", updateFirst, false);
+    toolCouleurReperes.addEventListener("change", updateAll, false);
     toolCouleurTrait.addEventListener("input", updateFirst, false);
     toolCouleurTrait.addEventListener("change", updateAll, false);
     toolCouleurGrille.addEventListener("input", updateFirst, false);
@@ -52,15 +59,16 @@ function startup() {
     canvas = document.getElementById('diagramme1');
     ctx = canvas.getContext('2d');
     dessineDiagramme();
-    loupeChercheAccordParNom.addEventListener("touchend", chercheAccordParNom(), false);
-    loupeChercheAccordParValeurs.addEventListener("touchend", chercheAccordParPosition(), false);
+    loupeChercheAccordParNom.addEventListener("touchend", chercheAccordParNom, false);
+    loupeChercheAccordParValeurs.addEventListener("touchend", chercheAccordParPosition, false);
 }
 
+// Change la taille du diagramme : la taille en pixels d'un carré du diagramme
 function changeTaille(nouvelleTaille) {
     taille = nouvelleTaille;
     epaisseurLigne = taille / 12;
     margeHauteurGrille = taille * 70 / 50;
-    margeGaucheGrille = taille / 2;
+    margeGaucheGrille = taille * 2 / 3;
     canvas.width = 4 * taille;
     canvas.height = 7 * taille;
 }
@@ -68,6 +76,7 @@ function changeTaille(nouvelleTaille) {
 // Appelé lors d'une mise à jour d'un outil
 function updateFirst(event) {
     couleurRemplissage = toolCouleurRemplissage.value;
+    couleurReperes = toolCouleurReperes.value;
     couleurTrait = toolCouleurTrait.value;
     couleurGrille = toolCouleurGrille.value;
     dessineDiagramme();
@@ -75,6 +84,7 @@ function updateFirst(event) {
 
 function updateAll(event) {
     couleurRemplissage = toolCouleurRemplissage.value;
+    couleurReperes = toolCouleurReperes.value;
     couleurTrait = toolCouleurTrait.value;
     couleurGrille = toolCouleurGrille.value;
     dessineDiagramme();
@@ -88,7 +98,6 @@ function outputUpdate(nouvelleTaille) {
 }
 
 // Dessine la grille du diagramme, légèrement irrégulière
-
 function dessineGrille() {
     let maxCasesVerticales = tailleGrilley - 1;
     let pointsGrille = [];
@@ -130,13 +139,14 @@ function dessineGrille() {
     return pointsGrille;
 }
 
+// Dessine le diagramme complet
 function dessineDiagramme() {
     blank();
     let pointsGrille;
     // console.log("Nombre de cases nécessaires : " + maxCasesVerticales );
     pointsGrille = dessineGrille();
 
-    let fretteZeroDuDiagramme = calculeFretteDepart(document.getElementById("valeurs").value);
+    let fretteZeroDuDiagramme = calculecaseDepart(document.getElementById("valeurs").value) - 1;
 
     // Si la première frette est la frette zéro, on la met en gras!
     if (fretteZeroDuDiagramme === 0) {
@@ -161,6 +171,18 @@ function dessineDiagramme() {
         }
         ctx.stroke();
     }
+
+    // Dessine les repères de frettes 5, 7, 10, 12, 15
+    const reperesSimples = [5, 7, 10, 15];
+    for (const numeroFretteRepere of reperesSimples) {
+        if ((numeroFretteRepere >= fretteZeroDuDiagramme) && (numeroFretteRepere <= fretteZeroDuDiagramme + 5)) {
+            repereSimple(numeroFretteRepere, fretteZeroDuDiagramme);
+        }
+    }
+
+    if ((fretteZeroDuDiagramme >= 8) && (fretteZeroDuDiagramme <= 13)) {
+        repereDouble(12 - fretteZeroDuDiagramme);
+    }
     ctx.beginPath();
     ctx.strokeStyle = couleurTrait; //Nuance de noir
     ctx.lineWidth = epaisseurLigne;
@@ -170,6 +192,51 @@ function dessineDiagramme() {
     ctx.stroke();
 }
 
+function repereSimple(numeroFretteDuRepere, fretteZeroDuDiagramme) {
+    ctx.beginPath();
+    ctx.lineWidth = epaisseurLigne;
+    ctx.strokeStyle = couleurReperes;
+    ctx.fillStyle = couleurReperes;
+    let caseDuPoint = numeroFretteDuRepere - fretteZeroDuDiagramme;
+
+    ctx.lineWidth = taille / 30;
+    let monx = margeGaucheGrille + (1.5) * taille;
+    let mony;
+    // Corde jouée
+    if (caseDuPoint > 0) {
+        mony = margeHauteurGrille + caseDuPoint * taille - taille / 2;
+        ctx.arc(monx, mony, taille / 6, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    ctx.stroke();
+}
+
+
+function repereDouble(numeroFretteDuRepere) {
+    ctx.lineWidth = epaisseurLigne;
+    ctx.strokeStyle = couleurReperes;
+    ctx.fillStyle = couleurReperes;
+    let caseDuPoint = numeroFretteDuRepere;
+
+    ctx.beginPath();
+    ctx.lineWidth = taille / 30;
+    let monx = margeGaucheGrille + (0.5) * taille;
+    let mony;
+    mony = margeHauteurGrille + caseDuPoint * taille - taille / 2;
+    ctx.arc(monx, mony, taille / 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.lineWidth = taille / 30;
+    monx = margeGaucheGrille + (2.5) * taille;
+    mony = margeHauteurGrille + caseDuPoint * taille - taille / 2;
+    ctx.arc(monx, mony, taille / 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+}
+
+// dessine un point sur le diagramme
 function dessinePoint(nCorde, nfrette) {
     ctx.beginPath();
     ctx.strokeStyle = couleurTrait;
@@ -230,7 +297,7 @@ function compteCasesNecessaires(valeurs) {
 }
 
 // trouve la frette la plus basse jouée dans l'accord
-function getValeurMin(valeurs) {
+function getValeurCaseMin(valeurs) {
     let valMin = 12;
     for (let compteur = 0; compteur < 4; compteur++) {
         if ((valeurs[compteur] > 0) && (valeurs[compteur] < valMin)) {
@@ -241,7 +308,7 @@ function getValeurMin(valeurs) {
 }
 
 // trouve la frette la plus hautee jouée dans l'accord
-function getValeurMax(valeurs) {
+function getValeurCaseMax(valeurs) {
     let valMax = 0;
     for (let compteur = 0; compteur < 4; compteur++) {
         if ((valeurs[compteur] > 0) && (valeurs[compteur] > valMax)) {
@@ -251,11 +318,13 @@ function getValeurMax(valeurs) {
     return (valMax);
 }
 
+// Vide le diagramme
 function blank() {
     ctx.fillStyle = couleurFond;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
+// Ecrit le nom de l'accord au dessus du diagramme
 function ecritNomAccord(nom) {
     ctx.font = 'bold ' + taille + 'px Verdana, Arial, serif';
     ctx.fillStyle = couleurTrait;
@@ -263,23 +332,31 @@ function ecritNomAccord(nom) {
     ctx.fillText(nom, margeGaucheGrille + 1.5 * taille, 2 * margeHauteurGrille / 3, taille * 3);
 }
 
-function calculeFretteDepart(valeurs) {
-    let fretteDepart = 0;
-    if ((getValeurMin(valeurs) > 1) && (getValeurMax(valeurs) > 4)) {
-        fretteDepart = getValeurMin(valeurs);
+// Calcule la case de départ qui semble le plus appropriée pour la position
+function calculecaseDepart(valeurs) {
+    let caseDepart = 1;
+    // Si l'utilisateur a choisi une caseDepartAuto
+    if (!document.getElementById("caseDepartAuto").checked) {
+        if ((getValeurCaseMin(valeurs) > 1) && (getValeurCaseMax(valeurs) > 5)) {
+            caseDepart = getValeurCaseMin(valeurs);
+        }
+    } else {
+        caseDepart = document.getElementById("caseDepart").value;
+        console.log("caseDepart : " + document.getElementById("caseDepart").value);
     }
-    return fretteDepart;
+    return caseDepart;
 }
 
+// pose les points qui doivent êtres joués sur le diagramme, ainsi que les autres détails
 function metLesDoigts(valeurs) {
     // Ecrit la frette de départ si ce n'est pas zéro
-    let fretteDepart = calculeFretteDepart(valeurs);
-    if (fretteDepart > 1) {
-
+    let caseDepart = calculecaseDepart(valeurs);
+    if (caseDepart > 1) {
+        console.log("coucou");
         ctx.beginPath();
-        ctx.font = 'bold ' + taille / 2 + 'px Verdana, Arial, serif';
+        ctx.font = 'bold ' + taille / 1.8 + 'px Verdana, Arial, serif';
         ctx.fillStyle = couleurTrait;
-        ctx.fillText(fretteDepart.toString(), margeGaucheGrille - (.35 * taille), margeHauteurGrille * 1.1);
+        ctx.fillText(caseDepart.toString(), margeGaucheGrille - (0.45 * taille), margeHauteurGrille + 0.7 * taille);
         ctx.stroke();
     }
 
@@ -287,16 +364,15 @@ function metLesDoigts(valeurs) {
         // Si la corde n'est pas jouée, on dessine une croix
         if (isNaN(valeurs[corde])) {
             dessinePoint(corde + 1, valeurs[corde]);
-        } else{
-
-             if (valeurs[corde] == 0){
+        } else {
+            let numeroFrette = parseInt(valeurs[corde]);
+            if (numeroFrette === 0) {
                 dessinePoint(corde + 1, 0);
             }
-            if (fretteDepart >0)            {
-                dessinePoint(corde + 1, valeurs[corde] - fretteDepart + 1);
-            }
-            else             {
-                dessinePoint(corde + 1, valeurs[corde]);
+            if (caseDepart > 0) {
+                dessinePoint(corde + 1, numeroFrette - caseDepart + 1);
+            } else {
+                dessinePoint(corde + 1, numeroFrette);
             }
         }
     }
@@ -318,6 +394,8 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
+// Propose de transformer en lien de download l'élément el
+// pour télécharger le diagramme affiché avec le nom d'accord comme nom de fichier
 function download_img(el) {
     let lienDownload = document.getElementById("download");
     let nomAccord = document.getElementById("name").value;
@@ -325,6 +403,7 @@ function download_img(el) {
     el.href = canvas.toDataURL("image/jpg");
 }
 
+// Affiche la position et le diagramme pour l'accord portant le nom saisi dans le champ de saisie
 function chercheAccordParNom() {
     let accord = document.getElementById("name").value;
     let saisieValeurs = document.getElementById("valeurs");
@@ -332,6 +411,7 @@ function chercheAccordParNom() {
     dessineDiagramme();
 }
 
+// Cherche le nom de l'accord avec la position saisie
 function chercheAccordParPosition() {
     console.log("coucou");
     let position = document.getElementById("valeurs").value;
@@ -347,6 +427,7 @@ function chercheAccordParPosition() {
     dessineDiagramme();
 }
 
+// Tire un accord au hasard dans la bibliothèque !
 function setAccordAuHasard() {
     const accords = Object.keys(tableauAccords);
     let nombreDaccords = accords.length;
@@ -355,4 +436,44 @@ function setAccordAuHasard() {
     saisieName.value = accords[numeroAccord];
     // console.log("Saisiename : " + accords[numeroAccord]);
     chercheAccordParNom();
+}
+
+// Permet de changer la position quand on clique sur le diagramme
+function clicSurDiagramme(event) {
+    // console.log("Clic sur " + event.clientX + " y : " + event.clientY);
+    let relatifX = event.clientX - margeGaucheGrille - document.getElementById("diagramme1").getBoundingClientRect().left;
+    let relatifY = event.clientY - margeHauteurGrille - document.getElementById("diagramme1").getBoundingClientRect().top;
+
+    relatifX = Math.round(relatifX / taille);
+    relatifY = Math.round(relatifY / taille + 0.5);
+    // console.log("Clic sur relatif " + relatifX + " y : " + relatifY);
+
+    if (relatifX < 4 && relatifY < 6) {
+        let position = document.getElementById("valeurs");
+        if (relatifX < 4)
+            position.value[relatifX] = relatifY;
+        let maNouvelleChaine = "";
+        for (let i = 0; i < 4; i++) {
+            if (i === relatifX) {
+                maNouvelleChaine += relatifY;
+            } else {
+                maNouvelleChaine += position.value.substr(i, 1);
+            }
+        }
+        console.log("nouvelle position : " + maNouvelleChaine);
+        position.value = maNouvelleChaine;
+        dessineDiagramme();
+    }
+}
+
+// Gestion du masquage / affichage de la saisie de la frette de début
+function onCheckcaseDepartAuto() {
+    let saisieFretteDebut = document.getElementById("caseDepart");
+    console.log("caseDepartAuto.value = " + document.getElementById("caseDepartAuto").checked);
+    if (document.getElementById("caseDepartAuto").checked) {
+        saisieFretteDebut.style.display = 'inline';
+
+    } else {
+        saisieFretteDebut.style.display = 'none';
+    }
 }
