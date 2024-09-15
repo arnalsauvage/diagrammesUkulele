@@ -66,8 +66,20 @@
         >🔍</span
       >
     </div>
+    <div id="popupMessage" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background-color: #f8d7da; color: #721c24; padding: 20px; border: 1px solid #f5c6cb; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); z-index: 1000;">
+      <p>La case de départ que vous avez choisie ne correspond pas à la plage de notes.<br>
+      Certaines notes ne seront pas  affichées.</p>
 
-    <div class="form-group">
+    </div>
+    <script>function afficherPopup() {
+      document.getElementById("popupMessage").style.display = "block";
+    }
+    
+    function masquerPopup() {
+      document.getElementById("popupMessage").style.display = "none";
+    }</script>
+    
+    <div class="form-group"  >
       <label for="caseDepart">Case de départ (auto)</label>
       <input
         id="caseDepart"
@@ -158,8 +170,11 @@
       <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();">
         Accord au hasard
       </button>
+      <button class="leBouton" id="btnPrecChord" onclick="diagramme.chercheAccordPrecedent();">
+        Accord précédent
+      </button>
       <button class="leBouton" id="btnNextChord" onclick="diagramme.chercheAccordSuivant();">
-        Accord au hasard
+        Accord suivant
       </button>
     </div>
     <script src="grille.js"></script>

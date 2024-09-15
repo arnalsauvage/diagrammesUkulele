@@ -74,7 +74,7 @@ class DiagrammeUkulele {
   dessineDiagramme() {
     this.blank();
     this.grille.dessineGrille();
-    let fretteZeroDuDiagramme = this.calculecaseDepart(this.valeurs.value) - 1;
+    let fretteZeroDuDiagramme = this.calculeCaseDepart(this.valeurs.value) - 1;
 
     // Dessiner les repères de frettes
     const reperesSimples = [5, 7, 10, 15];
@@ -144,12 +144,12 @@ class DiagrammeUkulele {
   }
 
   // Calcule la case de départ qui semble le plus appropriée pour la position
-  calculecaseDepart(valeurs) {
+  calculeCaseDepart(valeurs) {
     let caseDepart = 1;
     // Si l'utilisateur a choisi une caseDepartAuto
     if (!document.getElementById("caseDepartAuto").checked) {
-      if (getValeurCaseMin(valeurs) > 1 && getValeurCaseMax(valeurs) > 5) {
-        caseDepart = getValeurCaseMin(valeurs);
+      if (this.getValeurCaseMin(valeurs) > 1 && this.getValeurCaseMax(valeurs) > 5) {
+        caseDepart = this.getValeurCaseMin(valeurs);
       }
     } else {
       caseDepart = document.getElementById("caseDepart").value;
@@ -159,14 +159,13 @@ class DiagrammeUkulele {
     }
     return caseDepart;
   }
-  
+
   // Cette méthode ajoute les ronds sur le diagramme correspondants aux positions appuyées
   // Todo : ajouter la gestion des barrés !
   metLesDoigts(valeurs) {
     // Ecrit la frette de départ si ce n'est pas zéro
-    let caseDepart = this.calculecaseDepart(valeurs);
+    let caseDepart = this.calculeCaseDepart(valeurs);
     if (caseDepart > 1) {
-      console.log("coucou");
       this.ctx.beginPath();
       this.ctx.font = "bold " + this.taille / 1.8 + "px Verdana, Arial, serif";
       this.ctx.fillStyle = this.couleurOutils.couleurTrait;
@@ -309,32 +308,57 @@ class DiagrammeUkulele {
     dessineDiagramme();
   }
 
-chercheAccordSuivant( ){
-  let accord = document.getElementById("name").value;
-  
-  // Trouver l'index de l'accord actuel dans le tableau
-  let index = Object.keys(tableauAccords).indexOf(accord);
-  
-  if (index !== -1 && index < Object.keys(tableauAccords).length - 1) {
-    // Passer à l'accord suivant (n+1)
-    let prochainAccord = Object.keys(tableauAccords)[index + 1];
-    
-    // Afficher l'accord suivant dans la zone de saisie
-    let saisieValeurs = document.getElementById("valeurs");
-    saisieValeurs.value = tableauAccords[prochainAccord];
+  chercheAccordSuivant() {
+    let accord = document.getElementById("name").value;
 
-    let saisieNom = document.getElementById("name");
-saisieNom.value = prochainAccord;
+    // Trouver l'index de l'accord actuel dans le tableau
+    let index = Object.keys(tableauAccords).indexOf(accord);
 
-    // Mettre à jour le diagramme
-    dessineDiagramme();
-    
-    console.log(`Accord suivant: ${prochainAccord}`);
-  } else {
-    console.log("Pas d'accord suivant disponible.");
+    if (index !== -1 && index < Object.keys(tableauAccords).length - 1) {
+      // Passer à l'accord suivant (n+1)
+      let prochainAccord = Object.keys(tableauAccords)[index + 1];
+
+      // Afficher l'accord suivant dans la zone de saisie
+      let saisieValeurs = document.getElementById("valeurs");
+      saisieValeurs.value = tableauAccords[prochainAccord];
+
+      let saisieNom = document.getElementById("name");
+      saisieNom.value = prochainAccord;
+
+      // Mettre à jour le diagramme
+      dessineDiagramme();
+
+      console.log(`Accord suivant: ${prochainAccord}`);
+    } else {
+      console.log("Pas d'accord suivant disponible.");
+    }
   }
 
-}
+  chercheAccordPrecedent() {
+    let accord = document.getElementById("name").value;
+
+    // Trouver l'index de l'accord actuel dans le tableau
+    let index = Object.keys(tableauAccords).indexOf(accord);
+
+    if (index > 0) {
+      // Passer à l'accord précédent (n-1)
+      let accordPrecedent = Object.keys(tableauAccords)[index - 1];
+
+      // Afficher l'accord précédent dans la zone de saisie
+      let saisieValeurs = document.getElementById("valeurs");
+      saisieValeurs.value = tableauAccords[accordPrecedent];
+
+      let saisieNom = document.getElementById("name");
+      saisieNom.value = accordPrecedent;
+
+      // Mettre à jour le diagramme
+      dessineDiagramme();
+
+      console.log(`Accord précédent: ${accordPrecedent}`);
+    } else {
+      console.log("Pas d'accord précédent disponible.");
+    }
+  }
 
   chercheAccordParPosition() {
     // Logique pour chercher un accord par position et mettre à jour le diagramme
@@ -352,16 +376,25 @@ saisieNom.value = prochainAccord;
     dessineDiagramme();
   }
 
-  calculecaseDepart(valeurs) {
+  calculeCaseDepart(valeurs) {
     // Calculer la case de départ en fonction des valeurs
+    // On masque l'alerte par défaut
+    document.getElementById("popupMessage").style.display = "none";
     let caseDepart = 1;
     // Si l'utilisateur a choisi une caseDepartAuto
-    if (!document.getElementById("caseDepartAuto").checked) {
-      if (getValeurCaseMin(valeurs) > 1 && getValeurCaseMax(valeurs) > 5) {
-        caseDepart = getValeurCaseMin(valeurs);
+    if (document.getElementById("caseDepartAuto").checked) {
+      if (this.getValeurCaseMin(valeurs) > 1 && this.getValeurCaseMax(valeurs) > 5) {
+        caseDepart = this.getValeurCaseMin(valeurs)-1;
       }
     } else {
-      caseDepart = document.getElementById("caseDepart").value;
+      caseDepart = parseInt(document.getElementById("caseDepart").value, 10);
+      if ((caseDepart > this.getValeurCaseMin(valeurs)
+      || caseDepart +4  < this.getValeurCaseMax(valeurs)) )
+    {
+      // Afficher une alerte à l'utilisateur : certaines notes ne seront pas visible !
+      // alert("La case de départ que vous avez choisie ne correspond pas à la plage de notes");
+      document.getElementById("popupMessage").style.display = "block";
+    }
       console.log(
         "caseDepart : " + document.getElementById("caseDepart").value
       );
@@ -383,6 +416,30 @@ saisieNom.value = prochainAccord;
     saisieName.value = accords[numeroAccord];
     // console.log("Saisiename : " + accords[numeroAccord]);
     this.chercheAccordParNom();
+  }
+
+  // trouve la frette la plus basse jouée dans l'accord
+  getValeurCaseMin(valeurs) {
+    let valMin = 12;
+    for (let compteur = 0; compteur < 4; compteur++) {
+      if (valeurs[compteur] > 0 && valeurs[compteur] < valMin) {
+        valMin = valeurs[compteur];
+      }
+    }
+    console.log("CaseMin  de " + valeurs + " = " + valMin);
+    return parseInt(valMin);
+  }
+
+  // trouve la frette la plus hautee jouée dans l'accord
+  getValeurCaseMax(valeurs) {
+    let valMax = 0;
+    for (let compteur = 0; compteur < 4; compteur++) {
+      if (valeurs[compteur] > 0 && valeurs[compteur] > valMax) {
+        valMax = valeurs[compteur];
+      }
+    }
+    console.log("CaseMax  de " + valeurs + " = " + valMax);
+    return parseInt(valMax);
   }
 }
 

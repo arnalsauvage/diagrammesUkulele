@@ -31,6 +31,8 @@ class Grille {
 
   dessineGrille() {
     let maxCasesVerticales = this.options.tailleGrilley - 1;
+    let  maxCasesHorizontales = this.options.tailleGrillex;
+
     this.pointsGrille = [];
 
     // Création des points de la grille
@@ -50,21 +52,33 @@ class Grille {
     this.ctx.strokeStyle = this.options.couleurGrille;
     this.ctx.lineWidth = this.options.epaisseurLigne;
     this.ctx.beginPath();
-    for (let y = 0; y < maxCasesVerticales; y++) {
-      for (let x = 0; x < this.options.tailleGrillex; x++) {
+    for (let y = 0; y < maxCasesVerticales + 1; y++) {
+      for (let x = 0; x < maxCasesHorizontales; x++) {
         let x1 = this.getx(x, y);
         let y1 = this.gety(x, y);
-        let x2 = this.getx(x + 1, y);
-        let y2 = this.gety(x + 1, y);
-        let x3 = this.getx(x, y + 1);
-        let y3 = this.gety(x, y + 1);
 
+        let x2, x3, y2, y3;
+
+        if (y < maxCasesVerticales ) {
+          x3 = this.getx(x, y + 1);
+          y3 = this.gety(x, y + 1);
+        }
+        if (x !== 3) {
+          x2 = this.getx(x + 1, y);
+          y2 = this.gety(x + 1, y);
+        }
+
+        // Traits  horizontaux (3 x par ligne) n+1 fois
         if (x !== 3) {
           this.ctx.moveTo(x1, y1);
           this.ctx.lineTo(x2, y2);
         }
-        this.ctx.moveTo(x1, y1 - this.options.epaisseurLigne / 2);
-        this.ctx.lineTo(x3, y3 + this.options.epaisseurLigne / 2);
+
+        // Traits verticaux
+        if (y < maxCasesVerticales) {
+          this.ctx.moveTo(x1, y1 - this.options.epaisseurLigne / 2);
+          this.ctx.lineTo(x3, y3 + this.options.epaisseurLigne / 2);
+        }
       }
     }
     this.ctx.strokeStyle = this.options.couleurGrille;
