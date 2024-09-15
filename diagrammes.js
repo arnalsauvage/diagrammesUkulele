@@ -211,7 +211,6 @@ function repereSimple(numeroFretteDuRepere, fretteZeroDuDiagramme) {
     ctx.stroke();
 }
 
-
 function repereDouble(numeroFretteDuRepere) {
     ctx.lineWidth = epaisseurLigne;
     ctx.strokeStyle = couleurReperes;
@@ -477,3 +476,30 @@ function onCheckcaseDepartAuto() {
         saisieFretteDebut.style.display = 'none';
     }
 }
+
+
+function decodeEntree(entreeUtilisateur) {
+    let result = [];
+    let temp = 0;
+    // parcours de toute la chaine entrée
+    for (let i = 0; i < entreeUtilisateur.length; i++) {
+        if (entreeUtilisateur[i] === 'X') {
+            temp = 10;
+        } else {
+            temp += parseInt(entreeUtilisateur[i]);
+            result.push(parseInt(temp));
+            temp = 0;
+        }
+    }
+    return result;
+}
+
+function testDecodeEntree() {
+    console.log(decodeEntree('0123')); // [0, 1, 2, 3]
+    console.log(decodeEntree('4567')); // [4, 5, 6, 7]
+    console.log(decodeEntree('X1234')); // [11, 2, 3, 4]
+    console.log(decodeEntree('1X034')); // [1, 10, 3, 4]
+    console.log(decodeEntree('X2X344')); // [12, 13, 4, 4]
+}
+
+// testDecodeEntree();

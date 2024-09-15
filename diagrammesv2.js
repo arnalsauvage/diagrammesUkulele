@@ -159,6 +159,7 @@ class DiagrammeUkulele {
     }
     return caseDepart;
   }
+  
   // Cette méthode ajoute les ronds sur le diagramme correspondants aux positions appuyées
   // Todo : ajouter la gestion des barrés !
   metLesDoigts(valeurs) {
@@ -307,6 +308,33 @@ class DiagrammeUkulele {
     saisieValeurs.value = tableauAccords[accord];
     dessineDiagramme();
   }
+
+chercheAccordSuivant( ){
+  let accord = document.getElementById("name").value;
+  
+  // Trouver l'index de l'accord actuel dans le tableau
+  let index = Object.keys(tableauAccords).indexOf(accord);
+  
+  if (index !== -1 && index < Object.keys(tableauAccords).length - 1) {
+    // Passer à l'accord suivant (n+1)
+    let prochainAccord = Object.keys(tableauAccords)[index + 1];
+    
+    // Afficher l'accord suivant dans la zone de saisie
+    let saisieValeurs = document.getElementById("valeurs");
+    saisieValeurs.value = tableauAccords[prochainAccord];
+
+    let saisieNom = document.getElementById("name");
+saisieNom.value = prochainAccord;
+
+    // Mettre à jour le diagramme
+    dessineDiagramme();
+    
+    console.log(`Accord suivant: ${prochainAccord}`);
+  } else {
+    console.log("Pas d'accord suivant disponible.");
+  }
+
+}
 
   chercheAccordParPosition() {
     // Logique pour chercher un accord par position et mettre à jour le diagramme

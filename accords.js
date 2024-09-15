@@ -1,10 +1,13 @@
 const tableauAccords = {};
 
-// A faire  : 7 familles à renseigner Les accords Majeurs 7 augmentés M7+ , les accords Majeurs 7 de quinte diminuée  maj7(5b) ,
-// Les accords mineurs Majeur7 mMaj7, les accords de 7è augmentés aug7 , Les accords majeurs avec quinte diminuée b5,
+// A faire  : 5 familles à renseigner  ,  Les accords mineurs Majeur7 mMaj7, 
+//  Les accords majeurs avec quinte diminuée b5,les accords Majeurs 7 de quinte diminuée  maj7(5b)
 // Les accords de sixte /neuvième 6/9 , Les accords de neuvième 9,
 
-// Fait  : 13 familles renseignées maj min maj7 min7 7M sus2 sus4 aug dim dim7 5 6 m6 - 144 accords de base
+// Fait  : 14 familles renseignées  maj min maj7 min7 7M sus2 sus4 aug aug7 dim dim7 5 6 m6 - 168 accords
+// Accords de base : maj, min, maj7, min7, 7M 
+// Accords supplémentaires : sus2, sus4, dim7, 6, m6,
+// Accords supplémentaires : aug, aug7, dim, 5
 
 // Accords majeurs
 
@@ -130,10 +133,10 @@ tableauAccords["B5"] = "4x22";
 tableauAccords["Cdim"] = "5323";
 tableauAccords["C#dim"] = "6434";
 tableauAccords["Dbdim"] = "6434";
-tableauAccords["Ddim"] = "7545";
-tableauAccords["D#dim"] = "7545";
-tableauAccords["Ebdim"] = "7545";
-tableauAccords["Edim"] = "2320";
+tableauAccords["Ddim"] = "121x";
+tableauAccords["D#dim"] = "2320";
+tableauAccords["Ebdim"] = "2320";
+tableauAccords["Edim"] = "0401";
 tableauAccords["Fdim"] = "4542";
 tableauAccords["F#dim"] = "2020";
 tableauAccords["Gbdim"] = "2020";
@@ -146,8 +149,8 @@ tableauAccords["Bbdim"] = "3101";
 tableauAccords["Bdim"] = "4212";
 
 // Accords dim7
-
-tableauAccords["Cdim7"] = "3434";
+// Il n'y en a que 3 !
+tableauAccords["Cdim7"] = "2323";
 tableauAccords["C#dim7"] = "0101";
 tableauAccords["Dbdim7"] = "0101";
 tableauAccords["Ddim7"] = "1212";
@@ -166,7 +169,7 @@ tableauAccords["Bbdim7"] = "0101";
 tableauAccords["Bdim7"] = "1212";
 
 // Accords 5è augmentée
-
+// Caug = Eaug = G#Aug ==> il n'y en n'a que 4 !
 tableauAccords["Caug"] = "1003";
 tableauAccords["C#aug"] = "2110";
 tableauAccords["Dbaug"] = "2110";
@@ -185,10 +188,26 @@ tableauAccords["A#aug"] = "3221";
 tableauAccords["Bbaug"] = "3221";
 tableauAccords["Baug"] = "0332";
 
-// Accords 57 aug
+// Accords aug7 
+tableauAccords["Caug7"] = "1001";
+tableauAccords["C#aug7"] = "2112";
+tableauAccords["Dbaug7"] = "2112";
+tableauAccords["Daug7"] = "3223";
+tableauAccords["D#aug7"] = "4334";
+tableauAccords["Ebaug7"] = "4334";
+tableauAccords["Eaug7"] = "1203";
+tableauAccords["Faug7"] = "2314";
+tableauAccords["F#aug7"] = "3425";
+tableauAccords["Gbaug7"] = "3425";
+tableauAccords["Gaug7"] = "0312";
+tableauAccords["G#aug7"] = "1423";
+tableauAccords["Abaug7"] = "1423";
+tableauAccords["Aaug7"] = "0110";
+tableauAccords["A#aug7"] = "3223";
+tableauAccords["Bbaug7"] = "1221";
+tableauAccords["Baug7"] = "1221";
 
 // Accords 6
-
 tableauAccords["C6"] = "0000";
 tableauAccords["C#6"] = "1111";
 tableauAccords["Db6"] = "1111";
@@ -208,7 +227,6 @@ tableauAccords["Bb6"] = "0211";
 tableauAccords["B6"] = "1322";
 
 // Accords m6
-
 tableauAccords["Cm6"] = "2333";
 tableauAccords["C#m6"] = "1101";
 tableauAccords["Dbm6"] = "1101";
@@ -226,8 +244,6 @@ tableauAccords["Am6"] = "2423";
 tableauAccords["A#m6"] = "0111";
 tableauAccords["Bbm6"] = "0111";
 tableauAccords["Bm6"] = "1222";
-
-
 
 // Accords sus 2
 tableauAccords["Csus2"] = "0233";
@@ -249,7 +265,6 @@ tableauAccords["Bbsus2"] = "3011";
 tableauAccords["Bsus2"] = "4122";
 
 // Accords sus 4
-
 tableauAccords["Csus4"] = "0013";
 tableauAccords["C#sus4"] = "1124";
 tableauAccords["Dbsus4"] = "1124";
