@@ -148,7 +148,10 @@ class DiagrammeUkulele {
     let caseDepart = 1;
     // Si l'utilisateur a choisi une caseDepartAuto
     if (!document.getElementById("caseDepartAuto").checked) {
-      if (this.getValeurCaseMin(valeurs) > 1 && this.getValeurCaseMax(valeurs) > 5) {
+      if (
+        this.getValeurCaseMin(valeurs) > 1 &&
+        this.getValeurCaseMax(valeurs) > 5
+      ) {
         caseDepart = this.getValeurCaseMin(valeurs);
       }
     } else {
@@ -383,18 +386,22 @@ class DiagrammeUkulele {
     let caseDepart = 1;
     // Si l'utilisateur a choisi une caseDepartAuto
     if (document.getElementById("caseDepartAuto").checked) {
-      if (this.getValeurCaseMin(valeurs) > 1 && this.getValeurCaseMax(valeurs) > 5) {
-        caseDepart = this.getValeurCaseMin(valeurs)-1;
+      if (
+        this.getValeurCaseMin(valeurs) > 1 &&
+        this.getValeurCaseMax(valeurs) > 5
+      ) {
+        caseDepart = this.getValeurCaseMin(valeurs) - 1;
       }
     } else {
       caseDepart = parseInt(document.getElementById("caseDepart").value, 10);
-      if ((caseDepart > this.getValeurCaseMin(valeurs)
-      || caseDepart +4  < this.getValeurCaseMax(valeurs)) )
-    {
-      // Afficher une alerte à l'utilisateur : certaines notes ne seront pas visible !
-      // alert("La case de départ que vous avez choisie ne correspond pas à la plage de notes");
-      document.getElementById("popupMessage").style.display = "block";
-    }
+      if (
+        caseDepart > this.getValeurCaseMin(valeurs) ||
+        caseDepart + 4 < this.getValeurCaseMax(valeurs)
+      ) {
+        // Afficher une alerte à l'utilisateur : certaines notes ne seront pas visible !
+        // alert("La case de départ que vous avez choisie ne correspond pas à la plage de notes");
+        document.getElementById("popupMessage").style.display = "block";
+      }
       console.log(
         "caseDepart : " + document.getElementById("caseDepart").value
       );
@@ -426,7 +433,7 @@ class DiagrammeUkulele {
         valMin = valeurs[compteur];
       }
     }
-    console.log("CaseMin  de " + valeurs + " = " + valMin);
+    // console.log("CaseMin  de " + valeurs + " = " + valMin);
     return parseInt(valMin);
   }
 
@@ -438,8 +445,25 @@ class DiagrammeUkulele {
         valMax = valeurs[compteur];
       }
     }
-    console.log("CaseMax  de " + valeurs + " = " + valMax);
+    // console.log("CaseMax  de " + valeurs + " = " + valMax);
     return parseInt(valMax);
+  }
+
+  // Transformer en lien de download l'élément el
+  // pour télécharger le diagramme affiché avec le nom d'accord - position comme nom de fichier
+  download_img(el) {
+    let lienDownload = document.getElementById("download");
+    let nomAccord = document.getElementById("name").value;
+    let position = document.getElementById("valeurs").value;
+
+  // Générer le nom de fichier dynamique
+  lienDownload.download = nomAccord + "-" + position + ".jpg";
+  console.log("Nom de fichier:", lienDownload.download);
+
+  // Générer l'URL de téléchargement à partir du canvas
+    let canvas = document.getElementById("diagramme1");
+    el.href = canvas.toDataURL("image/jpg");
+    console.log("Lien href:", el.href);
   }
 }
 

@@ -162,9 +162,8 @@
       <a
         class="leBouton"
         download="myImage.jpg"
-        href=""
         id="download"
-        onclick="download_img(this);"
+        onclick="console.log('Test de clic'); diagramme.download_img(this);"
         >Télécharger Diagramme</a
       >
       <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();">
@@ -220,11 +219,6 @@
 
       function setAccordAuHasard() {
         diagramme.setAccordAuHasard();
-      }
-
-      function download_img(link) {
-        const canvas = document.getElementById("diagramme1");
-        link.href = canvas.toDataURL("image/jpeg");
       }
 
       function outputUpdate(nouvelleTaille) {
