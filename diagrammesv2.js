@@ -274,7 +274,14 @@ class DiagrammeUkulele {
     relatifY = Math.round(relatifY / this.taille + 0.5);
 
     console.log(`Coordonnées du clic: (${relatifX}, ${relatifY})`);
-    console.log("Clic sur relatif " + relatifX + " y : " + relatifY + " case départ = " + this.caseDepart.value);
+    console.log(
+      "Clic sur relatif " +
+        relatifX +
+        " y : " +
+        relatifY +
+        " case départ = " +
+        this.caseDepart.value
+    );
 
     if (relatifX < 4 && relatifY < 6) {
       let position = document.getElementById("valeurs");
@@ -284,16 +291,14 @@ class DiagrammeUkulele {
       if (relatifX < valeurArray.length) {
         let absoluY = relatifY + (parseInt(this.caseDepart.value) - 1);
         valeurArray[relatifX] = absoluY.toString(); // Assurez-vous que relatifY est converti en chaîne
-        console.log("Clic sur ligne " + absoluY );
+        console.log("Clic sur ligne " + absoluY);
       }
 
       // Reconvertir le tableau en une chaîne et mettre à jour la valeur de l'élément
       position.value = valeurArray.join("");
       let maNouvelleChaine = "";
       for (let i = 0; i < 4; i++) {
-    
-          maNouvelleChaine += position.value.substr(i, 1);
-    
+        maNouvelleChaine += position.value.substr(i, 1);
       }
       console.log("nouvelle position : " + maNouvelleChaine);
       position.value = maNouvelleChaine;
@@ -456,11 +461,11 @@ class DiagrammeUkulele {
     let nomAccord = document.getElementById("name").value;
     let position = document.getElementById("valeurs").value;
 
-  // Générer le nom de fichier dynamique
-  lienDownload.download = nomAccord + "-" + position + ".jpg";
-  console.log("Nom de fichier:", lienDownload.download);
+    // Générer le nom de fichier dynamique
+    lienDownload.download = nomAccord + "-" + position + ".jpg";
+    console.log("Nom de fichier:", lienDownload.download);
 
-  // Générer l'URL de téléchargement à partir du canvas
+    // Générer l'URL de téléchargement à partir du canvas
     let canvas = document.getElementById("diagramme1");
     el.href = canvas.toDataURL("image/jpg");
     console.log("Lien href:", el.href);

@@ -69,8 +69,14 @@ class Grille {
 
           if (y == 0) {
             // Premier trait horizontal deux fois plus épais
-            this.ctx.moveTo(x1 - this.options.epaisseurLigne/2, y1 - this.options.epaisseurLigne);
-            this.ctx.lineTo(x2 + this.options.epaisseurLigne/2, y2 - this.options.epaisseurLigne);
+            this.ctx.moveTo(
+              x1 - this.options.epaisseurLigne / 2,
+              y1 - this.options.epaisseurLigne
+            );
+            this.ctx.lineTo(
+              x2 + this.options.epaisseurLigne / 2,
+              y2 - this.options.epaisseurLigne
+            );
           }
         }
 
