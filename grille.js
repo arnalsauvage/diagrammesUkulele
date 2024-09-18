@@ -1,11 +1,11 @@
 // Classe pour gérer les couleurs des outils
 class CouleurOutils {
   constructor() {
-    this.couleurRemplissage = "#ff4444";
-    this.couleurReperes = "#ffb0b0";
-    this.couleurTrait = "#000000";
-    this.couleurGrille = "#333333";
-    this.couleurFond = "#ffffff";
+    this.couleurRemplissage = "#AA0000";
+    this.couleurReperes = "#ffb0b0";  // repères sur le manche cases 5 7 et 10
+    this.couleurTrait = "#000000";    // traits pour les ronds des cordes jouées , à vide, et police nom accord
+    this.couleurGrille = "#333333";   // Traits dessinés pour le diagramme
+    this.couleurFond = "#FFFFFF";   // remplissage des notes à vide
   }
 
   updateColors(
@@ -69,8 +69,14 @@ class Grille {
 
           if (y == 0) {
             // Premier trait horizontal deux fois plus épais
-            this.ctx.moveTo(x1 - this.options.epaisseurLigne/2, y1 - this.options.epaisseurLigne);
-            this.ctx.lineTo(x2 + this.options.epaisseurLigne/2, y2 - this.options.epaisseurLigne);
+            this.ctx.moveTo(
+              x1 - this.options.epaisseurLigne / 2,
+              y1 - this.options.epaisseurLigne
+            );
+            this.ctx.lineTo(
+              x2 + this.options.epaisseurLigne / 2,
+              y2 - this.options.epaisseurLigne
+            );
           }
         }
 

@@ -89,6 +89,26 @@ tableauAccords["A#m7"] = "1111";
 tableauAccords["Bbm7"] = "1111";
 tableauAccords["Bm7"] = "2222";
 
+// Accords mineurs 7M
+
+tableauAccords["Cm7M"] = "4333";
+tableauAccords["C#m7M"] = "1103";
+tableauAccords["Dbm7M"] = "1103";
+tableauAccords["Dm7M"] = "2214";
+tableauAccords["D#m7M"] = "3325";
+tableauAccords["Ebm7M"] = "3325";
+tableauAccords["Em7M"] = "0302";
+tableauAccords["Fm7M"] = "1413";
+tableauAccords["F#m7M"] = "2524";
+tableauAccords["Gbm7M"] = "2524";
+tableauAccords["Gm7M"] = "0222";
+tableauAccords["G#m7M"] = "1333";
+tableauAccords["Abm7M"] = "1333";
+tableauAccords["Am7M"] = "1000";
+tableauAccords["A#m7M"] = "2111";
+tableauAccords["Bbm7M"] = "2111";
+tableauAccords["Bm7M"] = "3222";
+
 // Accords 7è majeure
 
 tableauAccords["C7M"] = "0002";

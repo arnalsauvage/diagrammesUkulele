@@ -43,7 +43,8 @@
       <div class="infobulle-texte" id="aide_nomaccord" style="display: none">
         A B C D E F G pour la si do re mi fa sol , <br />b pour bémol, # pour
         dièse, <br />
-        désignation des accords : A, Am, A7M pour la 7ème majeure Am7, Asus2 <br>
+        désignation des accords : A, Am, A7M pour la 7ème majeure Am7, Asus2
+        <br />
         Asus4, Aaug pour la 5ème augmentée, Aaug7, Adim, Adim7, A5, A6, Am6
       </div>
     </div>
@@ -66,20 +67,40 @@
         >🔍</span
       >
     </div>
-    <div id="popupMessage" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background-color: #f8d7da; color: #721c24; padding: 20px; border: 1px solid #f5c6cb; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); z-index: 1000;">
-      <p>La case de départ que vous avez choisie ne correspond pas à la plage de notes.<br>
-      Certaines notes ne seront pas  affichées.</p>
-
+    <div
+      id="popupMessage"
+      style="
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 20px;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      "
+    >
+      <p>
+        La case de départ que vous avez choisie ne correspond pas à la plage de
+        notes.<br />
+        Certaines notes ne seront pas affichées.
+      </p>
     </div>
-    <script>function afficherPopup() {
-      document.getElementById("popupMessage").style.display = "block";
-    }
-    
-    function masquerPopup() {
-      document.getElementById("popupMessage").style.display = "none";
-    }</script>
-    
-    <div class="form-group"  >
+    <script>
+      function afficherPopup() {
+        document.getElementById("popupMessage").style.display = "block";
+      }
+
+      function masquerPopup() {
+        document.getElementById("popupMessage").style.display = "none";
+      }
+    </script>
+
+    <div class="form-group">
       <label for="caseDepart">Case de départ (auto)</label>
       <input
         id="caseDepart"
@@ -105,7 +126,7 @@
         id="couleurGrille"
         name="couleurGrille"
         type="color"
-        value="#987654"
+        value="#333333"
       />
       <label for="couleurGrille">couleur de traits pour la grille</label>
     </div>
@@ -114,9 +135,9 @@
         id="couleurTrait"
         name="couleurTrait"
         type="color"
-        value="#012345"
+        value="#111111"
       />
-      <label for="couleurTrait">couleur de traits pour les ronds</label>
+      <label for="couleurTrait">couleur de traits pour les ronds et le nom de l'accord</label>
     </div>
 
     <div>
@@ -124,7 +145,7 @@
         id="couleurRemplissage"
         name="couleurRemplissage"
         type="color"
-        value="#e66465"
+        value="#FF5555"
       />
       <label for="couleurRemplissage"
         >couleur de remplissage pour les ronds</label
@@ -169,10 +190,18 @@
       <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();">
         Accord au hasard
       </button>
-      <button class="leBouton" id="btnPrecChord" onclick="diagramme.chercheAccordPrecedent();">
+      <button
+        class="leBouton"
+        id="btnPrecChord"
+        onclick="diagramme.chercheAccordPrecedent();"
+      >
         Accord précédent
       </button>
-      <button class="leBouton" id="btnNextChord" onclick="diagramme.chercheAccordSuivant();">
+      <button
+        class="leBouton"
+        id="btnNextChord"
+        onclick="diagramme.chercheAccordSuivant();"
+      >
         Accord suivant
       </button>
     </div>
