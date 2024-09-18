@@ -274,7 +274,7 @@ class DiagrammeUkulele {
     relatifY = Math.round(relatifY / this.taille + 0.5);
 
     console.log(`Coordonnées du clic: (${relatifX}, ${relatifY})`);
-    console.log("Clic sur relatif " + relatifX + " y : " + relatifY);
+    console.log("Clic sur relatif " + relatifX + " y : " + relatifY + " case départ = " + this.caseDepart.value);
 
     if (relatifX < 4 && relatifY < 6) {
       let position = document.getElementById("valeurs");
@@ -282,18 +282,18 @@ class DiagrammeUkulele {
       let valeurArray = position.value.split("");
       // Modifier l'élément souhaité
       if (relatifX < valeurArray.length) {
-        valeurArray[relatifX] = relatifY.toString(); // Assurez-vous que relatifY est converti en chaîne
+        let absoluY = relatifY + (parseInt(this.caseDepart.value) - 1);
+        valeurArray[relatifX] = absoluY.toString(); // Assurez-vous que relatifY est converti en chaîne
+        console.log("Clic sur ligne " + absoluY );
       }
 
       // Reconvertir le tableau en une chaîne et mettre à jour la valeur de l'élément
       position.value = valeurArray.join("");
       let maNouvelleChaine = "";
       for (let i = 0; i < 4; i++) {
-        if (i === relatifX) {
-          maNouvelleChaine += relatifY;
-        } else {
+    
           maNouvelleChaine += position.value.substr(i, 1);
-        }
+    
       }
       console.log("nouvelle position : " + maNouvelleChaine);
       position.value = maNouvelleChaine;

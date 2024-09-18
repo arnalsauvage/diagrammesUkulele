@@ -4,7 +4,8 @@ class CouleurOutils {
     this.couleurRemplissage = "#ff4444";
     this.couleurReperes = "#ffb0b0";
     this.couleurTrait = "#000000";
-    this.couleurGrille = "#444444";
+    this.couleurGrille = "#333333";
+    this.couleurFond = "#ffffff";
   }
 
   updateColors(
@@ -30,14 +31,14 @@ class Grille {
   }
 
   dessineGrille() {
-    let maxCasesVerticales = this.options.tailleGrilley - 1;
-    let  maxCasesHorizontales = this.options.tailleGrillex;
+    let maxCasesVerticales = this.options.tailleGrilley;
+    let maxCasesHorizontales = this.options.tailleGrillex;
 
     this.pointsGrille = [];
 
     // Création des points de la grille
-    for (let y = 0; y <= maxCasesVerticales; y++) {
-      for (let x = 0; x < this.options.tailleGrillex; x++) {
+    for (let y = 0; y < maxCasesVerticales; y++) {
+      for (let x = 0; x < maxCasesHorizontales; x++) {
         let posX = this.options.margeGaucheGrille + x * this.taille;
         let posY = this.options.margeHauteurGrille + y * this.taille;
         if (this.options.bGrilleTordue && getRandomInt(120) < this.taille) {
@@ -52,30 +53,31 @@ class Grille {
     this.ctx.strokeStyle = this.options.couleurGrille;
     this.ctx.lineWidth = this.options.epaisseurLigne;
     this.ctx.beginPath();
-    for (let y = 0; y < maxCasesVerticales + 1; y++) {
+    for (let y = 0; y < maxCasesVerticales; y++) {
       for (let x = 0; x < maxCasesHorizontales; x++) {
         let x1 = this.getx(x, y);
         let y1 = this.gety(x, y);
 
         let x2, x3, y2, y3;
 
-        if (y < maxCasesVerticales ) {
-          x3 = this.getx(x, y + 1);
-          y3 = this.gety(x, y + 1);
-        }
-        if (x !== 3) {
+        // Trait  horizontal pour les trois premiers points horizontaux
+        if (x !== maxCasesHorizontales - 1) {
           x2 = this.getx(x + 1, y);
           y2 = this.gety(x + 1, y);
-        }
-
-        // Traits  horizontaux (3 x par ligne) n+1 fois
-        if (x !== 3) {
           this.ctx.moveTo(x1, y1);
           this.ctx.lineTo(x2, y2);
+
+          if (y == 0) {
+            // Premier trait horizontal deux fois plus épais
+            this.ctx.moveTo(x1 - this.options.epaisseurLigne/2, y1 - this.options.epaisseurLigne);
+            this.ctx.lineTo(x2 + this.options.epaisseurLigne/2, y2 - this.options.epaisseurLigne);
+          }
         }
 
-        // Traits verticaux
-        if (y < maxCasesVerticales) {
+        // Traits vertical pour les 5 premiers points verticaux
+        if (y < maxCasesVerticales - 1) {
+          x3 = this.getx(x, y + 1);
+          y3 = this.gety(x, y + 1);
           this.ctx.moveTo(x1, y1 - this.options.epaisseurLigne / 2);
           this.ctx.lineTo(x3, y3 + this.options.epaisseurLigne / 2);
         }
@@ -97,7 +99,14 @@ class Grille {
   }
 
   gety(x, y) {
-    return this.pointsGrille[x + this.options.tailleGrillex * y].y;
+    try {
+      return this.pointsGrille[x + this.options.tailleGrillex * y].y;
+    } catch (error) {
+      console.error(
+        `Erreur dans getx : x = ${x}, y = ${y}, message = ${error.message}`
+      );
+      throw error; // Rejette l'erreur après l'avoir loguée
+    }
   }
 
   setCouleurGrille(couleurGrille) {
