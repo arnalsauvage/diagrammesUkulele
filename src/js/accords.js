@@ -1,10 +1,10 @@
 const tableauAccords = {};
 
-// A faire  : 5 familles à renseigner  ,  Les accords mineurs Majeur7 mMaj7, 
+// À faire : 5 familles à renseigner, les accords mineurs Majeur7 mMaj7,
 //  Les accords majeurs avec quinte diminuée b5,les accords Majeurs 7 de quinte diminuée  maj7(5b)
-// Les accords de sixte /neuvième 6/9 , Les accords de neuvième 9,
+// Les accords de sixte /neuvième 6/9, Les accords de neuvième 9,
 
-// Fait  : 14 familles renseignées  maj min maj7 min7 7M sus2 sus4 aug aug7 dim dim7 5 6 m6 - 168 accords
+// Fait  : 14 familles renseignées maj min maj7 min7 7M sus2 sus4 aug aug7 dim dim7 5 6 m6 - 168 accords
 // Accords de base : maj, min, maj7, min7, 7M 
 // Accords supplémentaires : sus2, sus4, dim7, 6, m6,
 // Accords supplémentaires : aug, aug7, dim, 5

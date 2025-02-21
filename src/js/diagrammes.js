@@ -536,3 +536,34 @@ function testDecodeEntree() {
 }
 
 // testDecodeEntree();
+
+
+module.exports = {
+  changeTaille,
+  updateFirst,
+  updateAll,
+  outputUpdate,
+  dessineGrille,
+  dessineDiagramme,
+  repereSimple,
+  repereDouble,
+  dessinePoint,
+  compteCasesNecessaires,
+  getValeurCaseMin,
+  getValeurCaseMax,
+  blank,
+  ecritNomAccord,
+  calculecaseDepart,
+  metLesDoigts,
+  getx,
+  gety,
+  getRandomInt,
+  download_img,
+  chercheAccordParNom,
+  chercheAccordParPosition,
+  setAccordAuHasard,
+  clicSurDiagramme,
+  onCheckcaseDepartAuto,
+  decodeEntree,
+  testDecodeEntree
+};

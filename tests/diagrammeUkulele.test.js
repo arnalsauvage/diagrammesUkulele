@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <title>Grille ukulélé Top 5</title>
-    <meta charset="utf-8" />
-    <link href="style.css" rel="stylesheet" />
-  </head>
+// tests/diagrammeUkulele.test.js
+import DiagrammeUkulele from '../src/js/DessineDiagrammeUkulele.js';
+import * as test from "node:test";
 
-  <body>
-    <h1>Atelier diagrammes ukulélé Top 5</h1>
-    <a href="pageAccords.htm">aller à la page grille</a>
+describe('TEstDiagrammeUkulele', () => {
+  let diagramme;
+
+  beforeEach(() => {
+    // Créez une instance de DiagrammeUkulele avant chaque test
+    document.body.innerHTML = `  <h1>Atelier diagrammes ukulélé Top 5</h1>
+    <a href="./pageAccords.htm">aller à la page grille</a>
     <br />
     <canvas height="330" id="diagramme1" width="190"></canvas>
 
@@ -28,7 +28,7 @@
         >🔍</span
       >
       <img
-        src="petite-info-bulle.png"
+        src="../images/petite-info-bulle.png"
         alt="cherche accord"
         id="loupeChercheAccordParNom"
         class="infobulle-icone"
@@ -80,7 +80,7 @@
         padding: 20px;
         border: 1px solid #f5c6cb;
         border-radius: 5px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         z-index: 1000;
       "
     >
@@ -126,7 +126,7 @@
         id="couleurGrille"
         name="couleurGrille"
         type="color"
-        value="#987654"
+        value="#333333"
       />
       <label for="couleurGrille">couleur de traits pour la grille</label>
     </div>
@@ -135,9 +135,9 @@
         id="couleurTrait"
         name="couleurTrait"
         type="color"
-        value="#012345"
+        value="#111111"
       />
-      <label for="couleurTrait">couleur de traits pour les ronds</label>
+      <label for="couleurTrait">couleur de traits pour les ronds et le nom de l'accord</label>
     </div>
 
     <div>
@@ -145,7 +145,7 @@
         id="couleurRemplissage"
         name="couleurRemplissage"
         type="color"
-        value="#e66465"
+        value="#FF5555"
       />
       <label for="couleurRemplissage"
         >couleur de remplissage pour les ronds</label
@@ -204,65 +204,55 @@
       >
         Accord suivant
       </button>
-    </div>
-    <script src="grille.js"></script>
-    <script src="diagrammesv2.js"></script>
-    <!-- Chargé en premier -->
-    <script src="accords.js"></script>
-    <script>
-      function chercherAccordParNom() {
-        const nom = document.getElementById("name").value;
-        diagramme.chercheAccordParNom(nom);
-      }
+    </div>`;
+    // Exemple d'initialisation du diagramme
 
-      function chercherAccordParPosition() {
-        const valeurs = document.getElementById("valeurs").value;
-        diagramme.chercheAccordParPosition(valeurs);
-      }
+    const options = {
+      taille: 50,
+      tailleGrillex: 4,
+      tailleGrilley: 6,
+      margeHauteurGrille: 35,
+      margeGaucheGrille: 20,
+      epaisseurLigne: 9,
+      couleurGrille: "#444444",
+      bGrilleTordue: true,
+    };
+    diagramme = new DiagrammeUkulele("diagramme1", options);
 
-      function dessineDiagramme() {
-        const taille = document.getElementById("fader").value;
-        const couleurTrait = document.getElementById("couleurTrait").value;
-        const couleurGrille = document.getElementById("couleurGrille").value;
-        const couleurRemplissage =
-          document.getElementById("couleurRemplissage").value;
-        const couleurReperes = document.getElementById("couleurReperes").value;
-        /*
-        diagramme.setCouleurs(
-          couleurTrait,
-          couleurGrille,
-          couleurRemplissage,
-          couleurReperes
-        );
-        */
-        diagramme.dessineDiagramme();
-      }
+    diagramme.valeurs = document.createElement('div');
+    diagramme.valeurs.id = 'valeurs';
+    document.body.appendChild(diagramme.valeurs);
 
-      function checkcaseDepartAuto() {
-        const caseDepart = document.getElementById("caseDepart");
-        caseDepart.style.display = document.getElementById("caseDepartAuto")
-          .checked
-          ? "none"
-          : "inline-block";
-      }
+    diagramme.nomAccord = document.createElement('div');
+    diagramme.nomAccord.id = 'name';
+    document.body.appendChild(diagramme.nomAccord);
 
-      function setAccordAuHasard() {
-        diagramme.setAccordAuHasard();
-      }
+    diagramme.caseDepart = document.createElement('div');
+    diagramme.caseDepart.id = 'caseDepart';
+    document.body.appendChild(diagramme.caseDepart);
 
-      function outputUpdate(nouvelleTaille) {
-        document.querySelector("#taille").value = nouvelleTaille;
-        diagramme.changeTaille(nouvelleTaille);
-        dessineDiagramme();
-      }
+    diagramme.caseDepartAuto = document.createElement('div');
+    diagramme.caseDepartAuto.id = 'caseDepartAuto';
+    document.body.appendChild(diagramme.caseDepartAuto);
+    diagramme.valeurs = "2210";
+    diagramme.nomAccord = document.getElementById("name");
+    diagramme.caseDepart = 1;
+    diagramme.caseDepartAuto = document.getElementById("caseDepartAuto");
+    diagramme.startup();
+    checkcaseDepartAuto();
+  
+  });
 
-      function afficher_aide(aide) {
-        aide.style.display = "inline";
-      }
+  test('should initialize with correct options', () => {
+    expect(diagramme.taille).toBe(50);
+    expect(diagramme.grille.options.epaisseurLigne).toBe(9);
+  });
 
-      function masquer_aide(aide) {
-        aide.style.display = "none";
-      }
-    </script>
-  </body>
-</html>
+  test('should draw the diagram correctly', () => {
+    // Vous pouvez simuler le dessin et vérifier les résultats
+    expect(diagramme.calculeCaseDepart("2102")).toBe(0  );
+    // Ajoutez des assertions pour vérifier l'état du canvas ou d'autres propriétés
+  });
+
+  // Ajoutez d'autres tests pour les méthodes de la classe
+});
