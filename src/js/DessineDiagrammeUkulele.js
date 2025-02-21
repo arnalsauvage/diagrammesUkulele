@@ -74,6 +74,9 @@ class DessineDiagrammeUkulele {
     blank() {
         // Efface le canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = "white"; // Couleur de fond
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // Remplir le canvas
+
     }
 
     // Get values from penseDiagrammeUkulele
@@ -348,12 +351,12 @@ class DessineDiagrammeUkulele {
         let position = document.getElementById("valeurs").value;
 
         // Générer le nom de fichier dynamique
-        lienDownload.download = nomAccord + "-" + position + ".jpg";
+        lienDownload.download = nomAccord + "-" + position + ".png";
         console.log("Nom de fichier:", lienDownload.download);
 
         // Générer l'URL de téléchargement à partir du canvas
         let canvas = document.getElementById("diagramme1");
-        el.href = canvas.toDataURL("image/jpg");
+        el.href = canvas.toDataURL("image/png");
         console.log("Lien href:", el.href);
     }
 

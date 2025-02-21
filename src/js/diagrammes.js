@@ -515,11 +515,11 @@ function decodeEntree(entreeUtilisateur) {
   let result = [];
   let temp = 0;
   // parcours de toute la chaine entrée
-  for (let i = 0; i < entreeUtilisateur.length; i++) {
-    if (entreeUtilisateur[i] === "X") {
+  for (const item of entreeUtilisateur) {
+    if (item === "X") {
       temp = 10;
     } else {
-      temp += parseInt(entreeUtilisateur[i]);
+      temp += parseInt(item);
       result.push(parseInt(temp));
       temp = 0;
     }

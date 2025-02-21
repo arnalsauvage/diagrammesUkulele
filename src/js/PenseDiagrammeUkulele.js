@@ -123,17 +123,17 @@ class PenseDiagrammeUkulele
         // Trouver l'index de l'accord actuel dans le tableau
         let index = Object.keys(tableauAccords).indexOf(this.nomAccord);
 
-        if (index !== -1 && index < Object.keys(tableauAccords).length - 1) {
+        if (index !== Object.keys(tableauAccords).length - 1) {
             // Passer à l'accord suivant (n+1)
             index += 1;
-
         } else {
             index = 0;
         }
-        let prochainAccord = Object.keys(tableauAccords)[index + 1];
+        let prochainAccord = Object.keys(tableauAccords)[index];
         this.valeurs = tableauAccords[prochainAccord];
-        this.nomAccord = document.getElementById("name").value;
+        this.nomAccord = prochainAccord;
         console.log("Accord suivant: " + this.nomAccord);
+        this.chercheAccordParNom(this.nomAccord);
     }
 
     chercheAccordPrecedent() {
@@ -149,6 +149,7 @@ class PenseDiagrammeUkulele
         this.valeurs = tableauAccords[accordPrecedent];
         this.nomAccord = accordPrecedent;
         document.getElementById("name").value = this.nomAccord;
+        this.chercheAccordParNom(this.nomAccord);
         console.log(`Accord précédent: ${this.nomAccord}`);
     }
 
@@ -177,7 +178,7 @@ class PenseDiagrammeUkulele
         let saisieName = document.getElementById("name");
         saisieName.value = accords[numeroAccord];
         console.log("Saisiename : " + accords[numeroAccord]);
-        this.chercheAccordParNom();
+        this.chercheAccordParNom(saisieName.value);
     }
 
 // trouve la frette la plus basse jouée dans l'accord
