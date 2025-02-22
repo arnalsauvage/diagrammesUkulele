@@ -74,7 +74,7 @@ class DessineDiagrammeUkulele {
     blank() {
         // Efface le canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "white"; // Couleur de fond
+        this.ctx.fillStyle = this.couleurOutils.couleurFond; // Couleur de fond
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // Remplir le canvas
 
     }

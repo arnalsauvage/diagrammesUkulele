@@ -5,7 +5,7 @@ class CouleurOutils {
     this.couleurReperes = "#ffb0b0";
     this.couleurTrait = "#000000";
     this.couleurGrille = "#333333";
-    this.couleurFond = "#000000";
+    this.couleurFond = "#FFFFFF";
   }
 
   updateColors(

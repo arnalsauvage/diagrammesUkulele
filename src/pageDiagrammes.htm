@@ -125,7 +125,7 @@
             id="couleurGrille"
             name="couleurGrille"
             type="color"
-            value="#987654"
+            value="#333333"
     />
     <label for="couleurGrille">couleur de traits pour la grille</label>
 </div>
@@ -134,7 +134,7 @@
             id="couleurTrait"
             name="couleurTrait"
             type="color"
-            value="#012345"
+            value="#111111"
     />
     <label for="couleurTrait">couleur de traits pour les ronds</label>
 </div>
@@ -144,7 +144,7 @@
             id="couleurRemplissage"
             name="couleurRemplissage"
             type="color"
-            value="#e66465"
+            value="#FF5555"
     />
     <label for="couleurRemplissage"
     >couleur de remplissage pour les ronds</label
@@ -156,7 +156,7 @@
             id="couleurReperes"
             name="couleurReperes"
             type="color"
-            value="#FF9090"
+            value="#FFBBBB"
     />
     <label for="couleurReperes">couleur des repères sur le manche</label>
 </div>
@@ -226,15 +226,6 @@
     }
 
     function dessineDiagramme() {
-        const taille = document.getElementById("fader").value;
-        const couleurTrait = document.getElementById("couleurTrait").value;
-        const couleurGrille = document.getElementById("couleurGrille").value;
-        const couleurRemplissage =
-            document.getElementById("couleurRemplissage").value;
-        const couleurReperes = document.getElementById("couleurReperes").value;
-
-
-
         window.diagramme.majVersPense();
         window.diagramme.dessineDiagramme();
     }
