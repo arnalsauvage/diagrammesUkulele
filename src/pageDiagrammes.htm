@@ -5,89 +5,50 @@
     <meta charset="utf-8"/>
     <link href="./style.css" rel="stylesheet"/>
 </head>
-
 <body>
 <h1>Atelier diagrammes ukulélé Top 5</h1>
-<a href="./pageAccords.htm">aller à la page grille</a>
-<br/><br/>
+<a href="./pageAccords.htm">aller à la page "grille"</a>
+<br/>
+<br/>
 <canvas height="330" id="diagramme1" width="190"></canvas>
-
 <div class="form-group">
     <label for="name">Nom de l'accord :</label>
-    <input
-            id="name"
-            maxlength="8"
-            minlength="1"
-            name="name"
-            size="8"
-            type="text"
-            value="Dm7"
-            onkeyup="if(event.keyCode===13) chercherAccordParNom()"
-    />
-    <span role="img" aria-label="loupe" onclick="chercherAccordParNom()"
-    >🔍</span>
-    <img
-            src="./images/petite-info-bulle.png"
-            alt="cherche accord"
-            id="loupeChercheAccordParNom"
-            class="infobulle-icone"
-            width="16"
-            height="15"
-            onmouseover="afficher_aide(document.getElementById('aide_nomaccord'))"
-            onmouseout="masquer_aide(document.getElementById('aide_nomaccord'))"
-    />
+    <input id="name" maxlength="8" minlength="1" name="name" onkeyup="if(event.keyCode===13) chercherAccordParNom()"
+           size="8" type="text" value="Dm7"/>
+    <span aria-label="loupe" onclick="chercherAccordParNom()" role="img">🔍</span>
+    <img alt="infobulle icone" class="infobulle-icone" height="15" id="loupeChercheAccordParNom"
+         onmouseout="masquer_aide(document.getElementById('aide_nomaccord'))"
+         onmouseover="afficher_aide(document.getElementById('aide_nomaccord'))" src="./images/petite-info-bulle.png"
+         width="16"/>
 </div>
-
 <div class="infobulle">
-    <div class="infobulle-texte" id="aide_nomaccord" style="display: none">
-        A B C D E F G pour la si do re mi fa sol , <br/>b pour bémol, # pour
-        dièse, <br/>
-        désignation des accords : A, Am, A7M pour la 7ème majeure Am7, Asus2
-        <br/>
-        Asus4, Aaug pour la 5ème augmentée, Aaug7, Adim, Adim7, A5, A6, Am6
+    <div class="infobulle-texte" id="aide_nomaccord" style="display: none"> A B C D E F G pour la si do re mi fa sol ,
+        <br/>b pour bémol, # pour dièse, <br/> Désignation des accords : A, Am, A7M pour la 7ème majeure Am7, Am7M pour la mineur 7ème majeur, Asus2
+        <br/> Asus4, Aaug pour la 5ème augmentée, Aaug7, Adim, Adim7, A5, A6, Am6
     </div>
 </div>
-
 <div class="form-group">
     <label for="valeurs">Valeurs (0 à 9):</label>
-    <input
-            id="valeurs"
-            maxlength="12"
-            minlength="1"
-            name="valeurs"
-            size="4"
-            type="text"
-            value="2210"
-            onkeyup="if(event.key==='Enter') chercherAccordParPosition()"
-    />
-    <span
-            onclick="chercherAccordParPosition()"
-            id="loupeChercheAccordParValeurs"
-    >🔍</span
-    >
+    <input id="valeurs" maxlength="12" minlength="1" name="valeurs"
+           onkeyup="if(event.key==='Enter') chercherAccordParPosition()" size="4" type="text" value="2210"/>
+    <span id="loupeChercheAccordParValeurs" onclick="chercherAccordParPosition()">🔍</span>
+    <img alt="infobulle valeurs des cases" class="infobulle-icone" height="15" id="infobulle"
+         onmouseout="masquer_aide(document.getElementById('aide_valeur'))"
+         onmouseover="afficher_aide(document.getElementById('aide_valeur'))" src="./images/petite-info-bulle.png"
+         width="16"/>
 </div>
-<div
-        id="popupMessage"
-        style="
-        display: none;
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 20px;
-        border: 1px solid #f5c6cb;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-      "
->
-    <p>
-        La case de départ que vous avez choisie ne correspond pas à la plage de
-        notes.<br/>
-        Certaines notes ne seront pas affichées.
-    </p>
+<div id="popupMessage" style="display:none;position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);
+    background-color:#f8d7da;color:#721c24;padding:20px;border:1px solid #f5c6cb;border-radius:5px;
+    box-shadow:0 0 10px rgba(0,0,0,.1);z-index:1000">
+    <p> La case de départ que vous avez choisie ne correspond pas à la plage de notes. <br/> Certaines notes ne seront
+        pas affichées. </p>
+</div>
+<div class="infobulle">
+    <div class="infobulle-texte" id="aide_valeur" style="display: none">Ecris les valeurs des cases successives,
+        <br/>ex : 0003 pour C ou 2220 pour D.
+        <br/> Pour un accord avec des chiffres spéciaux, il faudra ajouter des points entre les chiffres : 0.10.11.12
+        <br/> les chiffres spéciaux : "-1" pour une corde non jouée, et 10 11 12 13 14...
+    </div>
 </div>
 <script>
     function afficherPopup() {
@@ -98,111 +59,43 @@
         document.getElementById("popupMessage").style.display = "none";
     }
 </script>
-
 <div class="form-group">
     <label for="caseDepart">Case de départ (auto)</label>
-    <input
-            id="caseDepart"
-            type="number"
-            min="1"
-            max="12"
-            value="1"
-            style="display: none"
-            onclick="dessineDiagramme();"
-    />
-    <input
-            type="checkbox"
-            id="caseDepartAuto"
-            onchange="checkcaseDepartAuto(); dessineDiagramme();"
-            checked
-    />
+    <input id="caseDepart" max="12" min="1" onclick="dessineDiagramme();" style="display: none" type="number"
+           value="1"/>
+    <input checked id="caseDepartAuto" onchange="checkcaseDepartAuto(); dessineDiagramme();" type="checkbox"/>
 </div>
-<button id="button-dessine" class="leBouton" onclick="dessineDiagramme();">
-    dessine
-</button>
+<button class="leBouton" id="button-dessine" onclick="dessineDiagramme();"> dessine</button>
 <div>
-    <input
-            id="couleurGrille"
-            name="couleurGrille"
-            type="color"
-            value="#333333"
-    />
+    <input id="couleurGrille" name="couleurGrille" type="color" value="#333333"/>
     <label for="couleurGrille">couleur de traits pour la grille</label>
 </div>
 <div>
-    <input
-            id="couleurTrait"
-            name="couleurTrait"
-            type="color"
-            value="#111111"
-    />
+    <input id="couleurTrait" name="couleurTrait" type="color" value="#111111"/>
     <label for="couleurTrait">couleur de traits pour les ronds</label>
 </div>
-
 <div>
-    <input
-            id="couleurRemplissage"
-            name="couleurRemplissage"
-            type="color"
-            value="#FF5555"
-    />
-    <label for="couleurRemplissage"
-    >couleur de remplissage pour les ronds</label
-    >
+    <input id="couleurRemplissage" name="couleurRemplissage" type="color" value="#FF5555"/>
+    <label for="couleurRemplissage">couleur de remplissage pour les ronds</label>
 </div>
-
 <div>
-    <input
-            id="couleurReperes"
-            name="couleurReperes"
-            type="color"
-            value="#FFBBBB"
-    />
+    <input id="couleurReperes" name="couleurReperes" type="color" value="#FFBBBB"/>
     <label for="couleurReperes">couleur des repères sur le manche</label>
 </div>
-
 <div class="row">
     <label class="inline col-sm-3" for="fader">Taille :</label>
     <div class="col-sm-5">
-        <input
-                id="fader"
-                max="50"
-                min="10"
-                name="ftempo"
-                oninput="outputUpdate(value)"
-                step="1"
-                type="range"
-                value="40"
-        />
+        <input id="fader" max="50" min="10" name="ftempo" oninput="outputUpdate(value)" step="1" type="range"
+               value="40"/>
         <output class="inline col-sm-2" for="fader" id="taille">40</output>
     </div>
 </div>
-
 <div>
-    <a
-            class="leBouton"
-            download="myImage.jpg"
-            id="download"
-            onclick="console.log('Test de clic'); diagramme.download_img(this);"
-    >Télécharger Diagramme</a
-    >
-    <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();">
-        Accord au hasard
-    </button>
-    <button
-            class="leBouton"
-            id="btnPrecChord"
-            onclick="diagramme.chercheAccordPrecedent();"
-    >
-        Accord précédent
-    </button>
-    <button
-            class="leBouton"
-            id="btnNextChord"
-            onclick="diagramme.chercheAccordSuivant();"
-    >
-        Accord suivant
-    </button>
+    <a class="leBouton" download="myImage.jpg" id="download"
+       onclick="console.log('Test de clic'); diagramme.download_img(this);">Télécharger Diagramme</a>
+    <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();"> Accord au hasard</button>
+    <button class="leBouton" id="btnPrecChord" onclick="diagramme.chercheAccordPrecedent();"> Accord précédent</button>
+    <button class="leBouton" id="btnNextChord" onclick="diagramme.chercheAccordSuivant();"> Accord suivant</button>
 </div>
 <!-- Chargé en premier -->
 <script src="./js/accords.js"></script>
@@ -211,9 +104,7 @@
 <script src="./js/PenseDiagrammeUkulele.js"></script>
 <script src="./js/DessineDiagrammeUkulele.js"></script>
 <script src="./js/diagrammesv2.js"></script>
-
 <script>
-
     function chercherAccordParNom() {
         const nom = document.getElementById("name").value;
         diagramme.chercheAccordParNom(nom);
@@ -232,10 +123,7 @@
 
     function checkcaseDepartAuto() {
         const caseDepart = document.getElementById("caseDepart");
-        caseDepart.style.display = document.getElementById("caseDepartAuto")
-            .checked
-            ? "none"
-            : "inline-block";
+        caseDepart.style.display = document.getElementById("caseDepartAuto").checked ? "none" : "inline-block";
     }
 
     function setAccordAuHasard() {

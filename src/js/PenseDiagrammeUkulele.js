@@ -2,36 +2,34 @@ const CASE_MAX = 12;
 
 const CORDES_MAX = 4;
 
-class PenseDiagrammeUkulele
-{
+class PenseDiagrammeUkulele {
     // caseDepart : entier positif (de 0 à 12)
     // nomAccord:  Chaîne de caractères
     // valeurs: tableau de 4 valeurs entières (de -1 à 18)
 
-    constructor( nomAccord, valeurs, caseDepart) {
+    constructor(nomAccord, valeurs, caseDepart) {
         // Initialisation des attributs
         this.setCaseDepart(caseDepart);
         this.setNomAccord(nomAccord);
         this.setValeursByString(valeurs);
     }
 
-    setValeursByString(maChaine){
-        if (maChaine.length===CORDES_MAX){
+    setValeursByString(maChaine) {
+        if (maChaine.length === CORDES_MAX) {
             this.convertitChaineSimple(maChaine);
-        }
-        else {
+        } else {
             this.convertitChaineComplexe(maChaine);
         }
 
     }
 
-    getValeurCorde(numeroCorde){
+    getValeurCorde(numeroCorde) {
         return this.valeurs[numeroCorde];
     }
 
-     convertitChaineSimple(maChaine) {
-         this.valeurs = maChaine.split('').map(Number);
-        }
+    convertitChaineSimple(maChaine) {
+        this.valeurs = maChaine.split('').map(Number);
+    }
 
     convertitChaineComplexe(maChaine) {
         // Diviser la chaîne par les points pour obtenir un tableau de valeurs
@@ -87,12 +85,11 @@ class PenseDiagrammeUkulele
         }
     }
 
-// Cette méthode modifie la valeur de l'accord suite à un clic sur la grille
-    modifieValeursSurClic(relatifXDansGrille, relatifYDansGrille)
-    {
+    // Cette méthode modifie la valeur de l'accord suite à un clic sur la grille
+    modifieValeursSurClic(relatifXDansGrille, relatifYDansGrille, caseDepart) {
         // Modifier l'élément souhaité
         if (relatifXDansGrille < this.valeurs.length) {
-            let absoluY = relatifYDansGrille + (parseInt(this.caseDepart) - 1);
+            let absoluY = relatifYDansGrille + (caseDepart - 1);
             this.valeurs[relatifXDansGrille] = absoluY.toString(); // Assurez-vous que relatifYDansGrille est converti en chaîne
             console.log("Clic sur case " + absoluY);
         }
@@ -100,7 +97,7 @@ class PenseDiagrammeUkulele
         return this.chaineValeur();
     }
 
-// Calcule la case de départ qui semble le plus appropriée pour la position
+    // Calcule la case de départ qui semble le plus appropriée pour la position
     calculeCaseDepart() {
         let caseDepart = 1;
 
@@ -113,8 +110,7 @@ class PenseDiagrammeUkulele
         return caseDepart;
     }
 
-    chercheAccordParNom(nomAccord)
-    {
+    chercheAccordParNom(nomAccord) {
         this.setNomAccord(nomAccord);
         this.setValeursByString(tableauAccords[this.nomAccord]);
     }
@@ -154,8 +150,7 @@ class PenseDiagrammeUkulele
     }
 
     // Cherche la position donnée par chaine dans le dico d'accords, et donne un nom
-    chercheAccordParPosition(sPosition)
-    {
+    chercheAccordParPosition(sPosition) {
         this.nomAccord = "non répertorié";
         for (let key in tableauAccords) {
             if (tableauAccords[key] === sPosition) {
@@ -169,9 +164,8 @@ class PenseDiagrammeUkulele
         return Math.floor(Math.random() * max);
     }
 
-// Tire un accord au hasard dans la bibliothèque !
-    setAccordAuHasard()
-    {
+    // Tire un accord au hasard dans la bibliothèque !
+    setAccordAuHasard() {
         const accords = Object.keys(tableauAccords);
         let nombreDaccords = accords.length;
         const numeroAccord = this.getRandomInt(nombreDaccords);
@@ -181,9 +175,8 @@ class PenseDiagrammeUkulele
         this.chercheAccordParNom(saisieName.value);
     }
 
-// trouve la frette la plus basse jouée dans l'accord
-    getValeurCaseMin()
-    {
+    // trouve la frette la plus basse jouée dans l'accord
+    getValeurCaseMin() {
         let valMin = CASE_MAX;
         for (let compteur = 0; compteur < CORDES_MAX; compteur++) {
             if (this.valeurs[compteur] > 0 && this.valeurs[compteur] < valMin) {
@@ -194,9 +187,8 @@ class PenseDiagrammeUkulele
         return parseInt(valMin);
     }
 
-// trouve la frette la plus haute jouée dans l'accord
-    getValeurCaseMax()
-    {
+    // trouve la frette la plus haute jouée dans l'accord
+    getValeurCaseMax() {
         let valMax = 0;
         for (let compteur = 0; compteur < CORDES_MAX; compteur++) {
             if (this.valeurs[compteur] > 0 && this.valeurs[compteur] > valMax) {
@@ -206,6 +198,5 @@ class PenseDiagrammeUkulele
         console.log("CaseMax  de " + this.valeurs + " = " + valMax);
         return parseInt(valMax);
     }
-
 
 }

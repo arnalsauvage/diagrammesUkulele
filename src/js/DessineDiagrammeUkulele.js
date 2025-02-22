@@ -240,13 +240,48 @@ class DessineDiagrammeUkulele {
         this.ctx.stroke();
     }
 
-    // Cette méthode ecrit le nom de l'accord en haut du diagramme
+    // Cette méthode écrit le nom de l'accord en haut du diagramme
     ecritNomAccord(nomAccord) {
+        let { tonale, suffixe } = this.splitChord(nomAccord);
         this.ctx.fillStyle = this.couleurOutils.couleurTrait;
-        this.ctx.font = "bold " + this.taille + "px Verdana, Arial, serif";
-        this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "middle";
-        this.ctx.fillText(nomAccord, this.canvas.width / 2, this.taille / 2);
+        this.ctx.textAlign = "left"; // On va calculer nous-mêmes l'alignement
+        this.ctx.textBaseline = "ideographic";
+
+        // Taille des polices
+        let tailleTonale = this.taille;
+        let tailleSuffixe = this.taille * 0.6;
+
+        // Définir les polices pour mesurer la largeur du texte
+        this.ctx.font = `bold ${tailleTonale}px Verdana, Arial, serif`;
+        let largeurTonale = this.ctx.measureText(tonale).width;
+
+        this.ctx.font = `bold ${tailleSuffixe}px Verdana, Arial, serif`;
+        let largeurSuffixe = this.ctx.measureText(suffixe).width;
+
+        // Coordonnées
+        let xCentre = this.canvas.width / 2;
+        let yCentre = this.taille ; // Position de référence
+
+        // Calcul du point de départ pour que l'ensemble soit centré
+        let xTonale = xCentre - (largeurTonale + largeurSuffixe) / 2;
+        let xSuffixe = xTonale + largeurTonale; // Juste après la tonale
+
+        // Dessiner la tonale
+        this.ctx.font = `bold ${tailleTonale}px Verdana, Arial, serif`;
+        this.ctx.fillText(tonale, xTonale, yCentre);
+
+        // Dessiner le suffixe juste à côté
+        this.ctx.font = `bold ${tailleSuffixe}px Verdana, Arial, serif`;
+        this.ctx.fillText(suffixe, xSuffixe, yCentre);
+    }
+
+    splitChord(chord) {
+        if (!chord) return { tonale: "", suffixe: "" };
+
+        let tonale = chord[0]; // Prend la première lettre
+        let suffixe = chord.slice(1); // Tout le reste
+
+        return { tonale, suffixe };
     }
 
     clicSurDiagramme(event) {
@@ -255,6 +290,11 @@ class DessineDiagrammeUkulele {
         const rect = diagramme.getBoundingClientRect();
         let relatifX = event.clientX - this.grille.options.margeGaucheGrille - rect.left;
         let relatifY = event.clientY - this.grille.options.margeHauteurGrille - rect.top;
+        if (relatifY < -30)
+        {
+            console.log ("clic trop au dessus du diagramme, non pris en compte : y = " + relatifY );
+            return;
+        }
 
         console.log(`event.clientX: ${event.clientX}`);
         console.log(`event.clientY: ${event.clientY}`);
@@ -267,11 +307,11 @@ class DessineDiagrammeUkulele {
         let relatifYDansGrille = Math.round(relatifY / this.taille + 0.5);
 
         console.log(`Coordonnées du clic: (${relatifXDansGrille}, ${relatifYDansGrille})`);
-        console.log("Clic sur relatif " + relatifXDansGrille + " y : " + relatifYDansGrille + " case départ = " + this.caseDepart.value);
+        console.log("Clic sur relatif x (corde) " + relatifXDansGrille + " y (case) : " + relatifYDansGrille + " case départ = " + this.caseDepart.value);
 
         // Si l'utilisateur a cliqué dans la grille
         if (relatifXDansGrille < 4 && relatifYDansGrille < 6) {
-            this.penseDiagrammeUkulele.modifieValeursSurClic(relatifXDansGrille, relatifYDansGrille);
+            this.penseDiagrammeUkulele.modifieValeursSurClic(relatifXDansGrille, relatifYDansGrille, parseInt(this.caseDepart.value) );
             this.getValuesFromPense();
             this.dessineDiagramme();
         }
