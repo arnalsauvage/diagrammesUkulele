@@ -23,7 +23,11 @@ const translations = {
         inputPlaceholder: "Saisissez vos accords séparés par des espaces :",
         helpName: "A B C D E F G (La Si Do Re Mi Fa Sol)<br/>b : bémol, # : dièse<br/>Exemple : Am, G7, Cmaj7, Ddim",
         helpValue: "Valeurs des cordes de Sol à La.<br/>Exemple : 0003 pour Do.<br/>Points pour les cases hautes : 0.10.11.12<br/>'x' pour une corde étouffée.",
-        errorFret: "⚠️ La case de départ choisie ne permet pas d'afficher toutes les notes."
+        errorFret: "⚠️ La case de départ choisie ne permet pas d'afficher toutes les notes.",
+        alternativesMsg: "Alternatives : découvre {n} positions jouables pour cet accord",
+        detectedChord: "Accord détecté :",
+        playable: "Jouable",
+        difficult: "Trop difficile"
     },
     en: {
         title: "Ukulele Chord Workshop",
@@ -49,7 +53,11 @@ const translations = {
         inputPlaceholder: "Enter chords separated by spaces:",
         helpName: "A B C D E F G (La Si Do Re Mi Fa Sol)<br/>b: flat, #: sharp<br/>Example: Am, G7, Cmaj7, Ddim",
         helpValue: "String values from G to A.<br/>Example: 0003 for C.<br/>Use dots for high frets: 0.10.11.12<br/>Use 'x' for muted strings.",
-        errorFret: "⚠️ Selected starting fret doesn't allow all notes to be shown."
+        errorFret: "⚠️ Selected starting fret doesn't allow all notes to be shown.",
+        alternativesMsg: "Alternatives: discover {n} playable positions for this chord",
+        detectedChord: "Detected chord:",
+        playable: "Playable",
+        difficult: "Too difficult"
     }
 };
 

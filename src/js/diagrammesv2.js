@@ -79,6 +79,18 @@ document.addEventListener("DOMContentLoaded", () => {
         window.diagramme.chercheAccordSuivant();
     });
 
+    // Générateur de Base de Données
+    const btnGen = document.getElementById("btnGenerateData");
+    if (btnGen) {
+        btnGen.addEventListener("click", () => {
+            const startTime = Date.now();
+            const data = ChordDataGenerator.generate();
+            const duration = (Date.now() - startTime) / 1000;
+            alert(`Génération réussie en ${duration}s ! Le fichier va être téléchargé.`);
+            ChordDataGenerator.saveAsFile(data);
+        });
+    }
+
     // Téléchargement
     document.getElementById("download").addEventListener("click", function(e) {
         window.diagramme.download_img(this);
@@ -93,6 +105,18 @@ document.addEventListener("DOMContentLoaded", () => {
         assistant.style.display = isHidden ? 'block' : 'none';
         toggleBtn.style.filter = isHidden ? 'drop-shadow(0 0 5px var(--primary-color))' : 'none';
     });
+
+    // --- Basculement des contrôles de couleur ---
+    const colorControls = document.getElementById('color-controls');
+    const toggleColorsBtn = document.getElementById('toggle-colors');
+    
+    if (toggleColorsBtn && colorControls) {
+        toggleColorsBtn.addEventListener('click', () => {
+            const isHidden = colorControls.style.display === 'none';
+            colorControls.style.display = isHidden ? 'block' : 'none';
+            toggleColorsBtn.style.filter = isHidden ? 'drop-shadow(0 0 5px var(--primary-color))' : 'none';
+        });
+    }
 
     let selection = { root: 'C', accidental: '', family: '' };
 

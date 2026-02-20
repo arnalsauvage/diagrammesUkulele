@@ -163,5 +163,28 @@ class PenseDiagrammeUkulele {
         }
         return parseInt(valMax);
     }
+
+    // Un accord est jouable si :
+    // 1. Les frettes sont entre 0 et 12 (ou -1 pour X)
+    // 2. L'écart entre la frette la plus basse et la plus haute (hors cordes à vide) est <= 3
+    estJouable() {
+        let min = 13;
+        let max = 0;
+        let aDesNotesAppuyees = false;
+
+        for (let i = 0; i < CORDES_MAX; i++) {
+            let v = this.valeurs[i];
+            if (v > 12) return false; // Trop haut sur le manche
+            if (v > 0) {
+                if (v < min) min = v;
+                if (v > max) max = v;
+                aDesNotesAppuyees = true;
+            }
+        }
+
+        if (!aDesNotesAppuyees) return true; // Accord à vide (0000)
+
+        return (max - min) <= 3;
+    }
 }
 

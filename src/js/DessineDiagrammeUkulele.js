@@ -1,30 +1,47 @@
-// import Grille from './grille.js';
-// import CouleurOutils from './couleurOutils.js';
+
 class DessineDiagrammeUkulele {
-    constructor(canvasId, options) {
-        this.canvas = document.getElementById(canvasId);
+    constructor(canvasOrId, options) {
+        this.canvas = (typeof canvasOrId === 'string') 
+            ? document.getElementById(canvasOrId) 
+            : canvasOrId;
+
+        if (!this.canvas) {
+            throw new Error(`Canvas introuvable : ${canvasOrId}`);
+        }
+
         this.ctx = this.canvas.getContext("2d");
+        this.options = options;
         this.taille = options.taille;
         this.grille = new Grille(this.canvas, this.taille, options);
         this.couleurOutils = new CouleurOutils();
         
-        // On récupère les éléments du DOM une seule fois
-        this.inputValeurs = document.getElementById("valeurs");
-        this.inputNomAccord = document.getElementById("name");
-        this.inputCaseDepart = document.getElementById("caseDepart");
-        this.inputCaseDepartAuto = document.getElementById("caseDepartAuto");
-        
-        this.penseDiagrammeUkulele = new PenseDiagrammeUkulele(
-            this.inputNomAccord.value, 
-            this.inputValeurs.value, 
-            -1
-        );
+        // Initialiser les couleurs par défaut (au cas où startup n'est pas appelé)
+        this.couleurOutils.updateColors("#FF5555", "#FFBBBB", "#111111", "#333333");
+
+        // Initialiser les dimensions et marges
+        this.changeTaille(this.taille);
+
+        if (!options.isMiniature) {
+            this.inputValeurs = document.getElementById("valeurs");
+            this.inputNomAccord = document.getElementById("name");
+            this.inputCaseDepart = document.getElementById("caseDepart");
+            this.inputCaseDepartAuto = document.getElementById("caseDepartAuto");
+            
+            this.penseDiagrammeUkulele = new PenseDiagrammeUkulele(
+                this.inputNomAccord.value, 
+                this.inputValeurs.value, 
+                -1
+            );
+        } else {
+            this.penseDiagrammeUkulele = new PenseDiagrammeUkulele("", "0000", -1);
+        }
     }
 
     startup() {
+        if (this.options.isMiniature) return;
+
         this.updateColors();
 
-        // Gestion des événements
         document.querySelector("#couleurRemplissage").addEventListener("input", () => { this.updateColors(); this.dessineDiagramme(); });
         document.querySelector("#couleurReperes").addEventListener("input", () => { this.updateColors(); this.dessineDiagramme(); });
         document.querySelector("#couleurTrait").addEventListener("input", () => { this.updateColors(); this.dessineDiagramme(); });
@@ -32,7 +49,6 @@ class DessineDiagrammeUkulele {
 
         this.canvas.addEventListener("click", this.clicSurDiagramme.bind(this));
         
-        // Support tactile pour les loupes
         const loupeNom = document.getElementById("loupeChercheAccordParNom");
         const loupeVal = document.getElementById("loupeChercheAccordParValeurs");
         if (loupeNom) loupeNom.addEventListener("touchend", (e) => { e.preventDefault(); this.chercheAccordParNom(); });
@@ -68,14 +84,14 @@ class DessineDiagrammeUkulele {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // Met à jour les champs HTML à partir de l'état "Pense"
     syncPenseToUI() {
+        if (this.options.isMiniature) return;
         this.inputValeurs.value = this.penseDiagrammeUkulele.chaineValeur();
         this.inputNomAccord.value = this.penseDiagrammeUkulele.nomAccord;
     }
 
-    // Met à jour l'état "Pense" à partir des champs HTML
     syncUIToPense() {
+        if (this.options.isMiniature) return;
         this.penseDiagrammeUkulele.setValeursByString(this.inputValeurs.value);
         this.penseDiagrammeUkulele.setNomAccord(this.inputNomAccord.value);
         if (this.inputCaseDepartAuto.checked) {
@@ -89,7 +105,6 @@ class DessineDiagrammeUkulele {
         this.blank();
         let caseDepartEffective = this.getCaseDepartEffective();
         
-        // On ne dessine le sillet (frette 0 épaisse) que si on commence à la case 1
         this.grille.options.dessineSillet = (caseDepartEffective === 1);
         this.grille.dessineGrille();
         
@@ -109,37 +124,109 @@ class DessineDiagrammeUkulele {
         this.ctx.strokeStyle = this.couleurOutils.couleurTrait;
         this.ctx.lineWidth = this.grille.options.epaisseurLigne;
         this.metLesDoigts(caseDepartEffective);
+        
+        // On écrit le nom sur TOUS les diagrammes (y compris miniatures)
         this.ecritNomAccord(this.penseDiagrammeUkulele.nomAccord);
-        this.updateStringNotes();
+
+        if (!this.options.isMiniature) {
+            const positions = this.penseDiagrammeUkulele.valeurs;
+            const notes = UkuleleGCEA.getNotesForPosition(positions);
+            this.updateStringNotes(notes);
+            
+            const analyzer = new ChordAnalyzer(notes);
+            const chordName = analyzer.identifyChord();
+            this.updateAnalysisUI(chordName, analyzer);
+            
+            const mainName = chordName.split(' ou ')[0];
+            this.showAlternatives(mainName);
+        }
+        
         this.ctx.stroke();
     }
 
-    updateStringNotes() {
+    updateStringNotes(notes) {
         const display = document.getElementById("string-notes-display");
-        if (!display) return;
+        if (display) {
+            display.innerHTML = notes.map(n => `<span>${n}</span>`).join('');
+        }
+    }
 
-        // On récupère les valeurs actuelles (tableau d'entiers)
-        const positions = this.penseDiagrammeUkulele.valeurs;
-        // On utilise notre instance globale UkuleleGCEA (définie dans Instrument.js)
-        const notes = UkuleleGCEA.getNotesForPosition(positions);
-
-        // Mise à jour de l'affichage HTML
-        display.innerHTML = notes.map(n => `<span>${n}</span>`).join('');
-
-        // Analyse de l'accord
-        const analyzer = new ChordAnalyzer(notes);
+    updateAnalysisUI(chordName, analyzer) {
         const analysisDisplay = document.getElementById("chord-analysis-display");
         if (analysisDisplay) {
-            const chordName = analyzer.identifyChord();
-            const inversions = analyzer.getInversions();
             const isPlayable = this.penseDiagrammeUkulele.estJouable();
             const playableStatus = isPlayable 
-                ? '<span style="color: green">✅ Jouable</span>' 
-                : '<span style="color: red">❌ Trop difficile (écartement)</span>';
+                ? `<span style="color: green">✅ ${window.i18n.t('playable')}</span>` 
+                : `<span style="color: red">❌ ${window.i18n.t('difficult')}</span>`;
 
-            analysisDisplay.innerHTML = `<strong>Accord détecté : ${chordName}</strong> | ${playableStatus}<br/>
-                                        <small>Notes : ${inversions.map(inv => inv.join('-')).join(' | ')}</small>`;
+            analysisDisplay.innerHTML = `<strong>${window.i18n.t('detectedChord')} ${chordName}</strong> | ${playableStatus}<br/>
+                                        <small>Notes : ${analyzer.getInversions().map(inv => inv.join('-')).join(' | ')}</small>`;
         }
+    }
+
+    showAlternatives(targetName) {
+        if (this.options.isMiniature) return;
+
+        const container = document.getElementById("alternatives-container");
+        const title = document.getElementById("alternatives-title");
+        if (!container) return;
+        
+        container.innerHTML = "";
+        if (title) title.style.display = "none";
+
+        if (typeof generatedChords === 'undefined') return;
+
+        const positions = generatedChords[targetName];
+        if (!positions) return;
+
+        const fullPositions = positions.filter(pos => !pos.includes('x'));
+        if (fullPositions.length <= 1) return; // Pas besoin de titre s'il n'y a qu'une seule position (l'actuelle)
+
+        // Affichage du titre avec le compte
+        if (title) {
+            title.style.display = "block";
+            const msg = window.i18n.t('alternativesMsg').replace('{n}', fullPositions.length);
+            title.innerHTML = msg;
+        }
+
+        fullPositions.forEach((pos, index) => {
+            const wrapper = document.createElement("div");
+            wrapper.style.cursor = "pointer";
+            wrapper.style.border = "1px solid #ddd";
+            wrapper.style.borderRadius = "4px";
+            wrapper.style.padding = "2px";
+            wrapper.style.background = (pos === this.inputValeurs.value) ? "#e8f5e9" : "white";
+
+            const canvas = document.createElement("canvas");
+            canvas.width = 60;
+            canvas.height = 90;
+            
+            wrapper.appendChild(canvas);
+            container.appendChild(wrapper);
+
+            const miniOptions = {
+                taille: 12,
+                tailleGrillex: 4,
+                tailleGrilley: 6,
+                margeHauteurGrille: 15,
+                margeGaucheGrille: 8,
+                epaisseurLigne: 1,
+                couleurGrille: "#666",
+                bGrilleTordue: false,
+                isMiniature: true
+            };
+
+            const miniDiag = new DessineDiagrammeUkulele(canvas, miniOptions);
+            miniDiag.penseDiagrammeUkulele.setValeursByString(pos);
+            miniDiag.dessineDiagramme();
+
+            wrapper.addEventListener("click", () => {
+                this.inputValeurs.value = pos;
+                this.penseDiagrammeUkulele.setValeursByString(pos);
+                this.syncPenseToUI();
+                this.dessineDiagramme();
+            });
+        });
     }
 
     repereSimple(numeroFretteDuRepere, fretteZeroDuDiagramme) {
@@ -150,7 +237,6 @@ class DessineDiagrammeUkulele {
         let caseDuPoint = numeroFretteDuRepere - fretteZeroDuDiagramme;
         let monx = this.grille.options.margeGaucheGrille + 1.5 * this.taille;
         let mony = this.grille.options.margeHauteurGrille + caseDuPoint * this.taille - this.taille / 2;
-
         if (caseDuPoint > 0 && caseDuPoint <= 5) {
             this.ctx.arc(monx, mony, this.taille / 6, 0, 2 * Math.PI);
             this.ctx.fill();
@@ -159,22 +245,28 @@ class DessineDiagrammeUkulele {
     }
 
     repereDouble(numeroFretteDuRepere, fretteZeroDuDiagramme) {
-        this.ctx.beginPath();
         this.ctx.lineWidth = this.grille.options.taille / 30;
         this.ctx.strokeStyle = this.couleurOutils.couleurReperes;
         this.ctx.fillStyle = this.couleurOutils.couleurReperes;
+
         let caseDuPoint = numeroFretteDuRepere - fretteZeroDuDiagramme;
-        let x1 = this.grille.options.margeGaucheGrille + 0.5 * this.taille ;
+        let x1 = this.grille.options.margeGaucheGrille + 0.5 * this.taille;
         let y1 = this.grille.options.margeHauteurGrille + caseDuPoint * this.taille - this.taille / 2;
         let x2 = this.grille.options.margeGaucheGrille + 2.5 * this.taille;
-        let y2 = y1;
 
         if (caseDuPoint > 0 && caseDuPoint <= 5) {
-            this.ctx.arc(x1, y1,  this.taille / 8, 0, 2 * Math.PI);
-            this.ctx.arc(x2, y2,  this.taille / 8, 0, 2 * Math.PI);
+            // ✅ Premier cercle - son propre chemin
+            this.ctx.beginPath();
+            this.ctx.arc(x1, y1, this.taille / 8, 0, 2 * Math.PI);
             this.ctx.fill();
+            this.ctx.stroke();
+
+            // ✅ Deuxième cercle - son propre chemin
+            this.ctx.beginPath();
+            this.ctx.arc(x2, y1, this.taille / 8, 0, 2 * Math.PI);
+            this.ctx.fill();
+            this.ctx.stroke();
         }
-        this.ctx.stroke();
     }
 
     metLesDoigts(caseDepart) {
@@ -182,14 +274,19 @@ class DessineDiagrammeUkulele {
             this.ctx.beginPath();
             this.ctx.font = `bold ${this.taille / 1.8}px Verdana, Arial, serif`;
             this.ctx.fillStyle = this.couleurOutils.couleurTrait;
+            this.ctx.textAlign = "right"; 
+            
+            // On décale davantage à gauche (0.6 * taille) pour éviter les points sur la 1ère corde
+            let xPos = this.grille.options.margeGaucheGrille - (0.25 * this.taille);
+            
             this.ctx.fillText(
                 caseDepart.toString(),
-                this.grille.options.margeGaucheGrille - 0.45 * this.taille,
+                xPos,
                 this.grille.options.margeHauteurGrille + 0.7 * this.taille
             );
             this.ctx.stroke();
+            this.ctx.textAlign = "left"; 
         }
-
         for (let corde = 0; corde < CORDES_MAX; corde++) {
             const valeur = this.penseDiagrammeUkulele.getValeurCorde(corde);
             if (valeur === -1) {
@@ -205,13 +302,11 @@ class DessineDiagrammeUkulele {
 
     dessinePoint(nCorde, nfrette) {
         if (nfrette !== "x" && nfrette > 5) return;
-
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.couleurOutils.couleurTrait;
         this.ctx.lineWidth = this.taille / 20;
         let monx = this.grille.options.margeGaucheGrille + (nCorde - 1) * this.taille;
         let mony;
-
         if (nfrette > 0) {
             this.ctx.fillStyle = this.couleurOutils.couleurRemplissage;
             mony = this.grille.options.margeHauteurGrille + nfrette * this.taille - this.taille / 2;
@@ -236,55 +331,36 @@ class DessineDiagrammeUkulele {
 
     ecritNomAccord(nomAccord) {
         if (!nomAccord) return;
-        
         let tonale = nomAccord[0];
         let alteration = "";
         let suffixe = nomAccord.slice(1);
-
-        // Découpage en 3 parties
         if (nomAccord.length > 1 && (nomAccord[1] === '#' || nomAccord[1] === 'b')) {
             alteration = nomAccord[1];
             suffixe = nomAccord.slice(2);
         }
-        
         this.ctx.fillStyle = this.couleurOutils.couleurTrait;
         this.ctx.textAlign = "left";
         this.ctx.textBaseline = "ideographic";
-
-        // Définition des 3 tailles
         let tailleTonale = this.taille;
-        let tailleAlteration = this.taille * 0.75; // Taille intermédiaire
+        let tailleAlteration = this.taille * 0.75;
         let tailleSuffixe = this.taille * 0.6;
-
-        // Mesures
         this.ctx.font = `bold ${tailleTonale}px Verdana, Arial, serif`;
         let largeurTonale = this.ctx.measureText(tonale).width;
-        
         this.ctx.font = `bold ${tailleAlteration}px Verdana, Arial, serif`;
         let largeurAlteration = alteration ? this.ctx.measureText(alteration).width : 0;
-        
         this.ctx.font = `bold ${tailleSuffixe}px Verdana, Arial, serif`;
         let largeurSuffixe = this.ctx.measureText(suffixe).width;
-
-        // Calcul du centrage global
         let largeurTotale = largeurTonale + largeurAlteration + largeurSuffixe;
         let xCurrent = (this.canvas.width / 2) - (largeurTotale / 2);
         let yBase = this.taille;
-
-        // 1. Dessiner la tonale
         this.ctx.font = `bold ${tailleTonale}px Verdana, Arial, serif`;
         this.ctx.fillText(tonale, xCurrent, yBase);
         xCurrent += largeurTonale;
-
-        // 2. Dessiner l'altération (# ou b)
         if (alteration) {
             this.ctx.font = `bold ${tailleAlteration}px Verdana, Arial, serif`;
-            // On remonte un tout petit peu l'altération pour l'équilibre visuel
             this.ctx.fillText(alteration, xCurrent, yBase * 0.95);
             xCurrent += largeurAlteration;
         }
-
-        // 3. Dessiner le suffixe
         this.ctx.font = `bold ${tailleSuffixe}px Verdana, Arial, serif`;
         this.ctx.fillText(suffixe, xCurrent, yBase);
     }
@@ -293,30 +369,42 @@ class DessineDiagrammeUkulele {
         const rect = this.canvas.getBoundingClientRect();
         let relatifX = event.clientX - this.grille.options.margeGaucheGrille - rect.left;
         let relatifY = event.clientY - this.grille.options.margeHauteurGrille - rect.top;
-
         if (relatifY < -this.taille/2) return;
-
         let xGrille = Math.round(relatifX / this.taille);
         let yGrille = Math.round(relatifY / this.taille + 0.5);
-
         if (xGrille >= 0 && xGrille < 4 && yGrille >= 0 && yGrille <= 5) {
             this.penseDiagrammeUkulele.modifieValeursSurClic(xGrille, yGrille, this.getCaseDepartEffective());
+            
+            // Identification automatique après le clic
+            const positions = this.penseDiagrammeUkulele.valeurs;
+            const notes = UkuleleGCEA.getNotesForPosition(positions);
+            const analyzer = new ChordAnalyzer(notes);
+            const chordName = analyzer.identifyChord();
+            
+            // Mise à jour du nom si identifié, sinon vider
+            if (chordName !== "inconnu" && chordName !== "---") {
+                // On prend le premier nom si plusieurs sont trouvés (ex: C ou Am7)
+                const mainName = chordName.split(' ou ')[0];
+                this.penseDiagrammeUkulele.setNomAccord(mainName);
+            } else {
+                this.penseDiagrammeUkulele.setNomAccord("");
+            }
+
             this.syncPenseToUI();
             this.dessineDiagramme();
         }
     }
 
     getCaseDepartEffective() {
+        if (this.options.isMiniature) return 1;
         const popup = document.getElementById("popupMessage");
         if (popup) popup.style.display = "none";
-
         let caseDepart;
         if (this.inputCaseDepartAuto.checked) {
             caseDepart = this.penseDiagrammeUkulele.calculeCaseDepart();
         } else {
             caseDepart = Number(this.inputCaseDepart.value) || 1;
         }
-
         const min = this.penseDiagrammeUkulele.getValeurCaseMin();
         const max = this.penseDiagrammeUkulele.getValeurCaseMax();
         if (caseDepart > min || (caseDepart + 4) < max) {
@@ -362,8 +450,3 @@ class DessineDiagrammeUkulele {
         el.href = this.canvas.toDataURL("image/png");
     }
 }
-
-
-// Exporter la classe
-// export default DiagrammeUkulele;
-

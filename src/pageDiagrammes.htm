@@ -32,6 +32,11 @@
         <div id="chord-analysis-display" style="margin-top: 10px; font-size: 0.9rem; color: #666; font-style: italic;">
         </div>
 
+        <!-- Zone des alternatives miniatures -->
+        <div id="alternatives-title" style="margin-top: 20px; font-size: 0.85rem; color: #555; font-weight: bold; display: none;"></div>
+        <div id="alternatives-container">
+        </div>
+
         <div id="popupMessage" style="display:none; margin-top: 15px; background-color:#f8d7da; color:#721c24; padding:15px; border:1px solid #f5c6cb; border-radius:5px;">
             <p style="margin:0" data-i18n="errorFret">⚠️ La case de départ choisie ne permet pas d'afficher toutes les notes.</p>
         </div>
@@ -49,7 +54,7 @@
             <h3 data-i18n="chordDefinition">Chord Definition</h3>
             <div class="form-group">
                 <label for="name" data-i18n="name">Name:</label>
-                <input id="name" maxlength="8" name="name" type="text" value="Dm7"/>
+                <input id="name" maxlength="8" name="name" type="text" value="Dm"/>
                 <span id="toggle-assistant" style="cursor: pointer; font-size: 1.2rem; margin-left: 5px;" title="Assistant">🪄</span>
                 <img alt="info" class="infobulle-icone" height="16" id="loupeChercheAccordParNom" src="./images/petite-info-bulle.png" width="16"/>
                 <div class="infobulle-texte" id="aide_nomaccord" style="display: none" data-i18n="helpName">
@@ -108,40 +113,49 @@
                 <button class="leBouton" id="btnPrecChord" data-i18n="prev">&larr; Prev</button>
                 <button class="leBouton" id="randomChord" data-i18n="random">Random</button>
                 <button class="leBouton" id="btnNextChord" data-i18n="next">Next &rarr;</button>
+                <button class="leBouton secondary" id="btnGenerateData" style="font-size: 0.7rem; padding: 5px" title="Générer DB">⚙️ DB</button>
             </div>
         </div>
 
         <div class="control-group">
-            <h3 data-i18n="appearance">Appearance</h3>
+            <h3 style="display: flex; align-items: center; justify-content: space-between;">
+                <span data-i18n="appearance">Appearance</span>
+                <span id="toggle-colors" style="cursor: pointer; font-size: 1.2rem;" title="Couleurs">🎨</span>
+            </h3>
             <div class="form-group">
                 <label for="fader" data-i18n="size">Size:</label>
                 <input id="fader" max="70" min="20" name="ftempo" step="1" type="range" value="40"/>
                 <output id="taille" style="margin-left: 10px; font-weight: bold">40</output>
             </div>
-            <div class="form-group">
-                <label for="couleurRemplissage" data-i18n="dotFill">Dot Fill:</label>
-                <input id="couleurRemplissage" type="color" value="#FF5555"/>
-            </div>
-            <div class="form-group">
-                <label for="couleurTrait" data-i18n="dotOutline">Dot Outline:</label>
-                <input id="couleurTrait" type="color" value="#111111"/>
-            </div>
-            <div class="form-group">
-                <label for="couleurGrille" data-i18n="gridColor">Grid Color:</label>
-                <input id="couleurGrille" type="color" value="#333333"/>
-            </div>
-            <div class="form-group">
-                <label for="couleurReperes" data-i18n="markers">Markers:</label>
-                <input id="couleurReperes" type="color" value="#FFBBBB"/>
+            
+            <div id="color-controls" style="display: none; border-top: 1px solid #eee; padding-top: 10px; margin-top: 5px;">
+                <div class="form-group">
+                    <label for="couleurRemplissage" data-i18n="dotFill">Dot Fill:</label>
+                    <input id="couleurRemplissage" type="color" value="#FF5555"/>
+                </div>
+                <div class="form-group">
+                    <label for="couleurTrait" data-i18n="dotOutline">Dot Outline:</label>
+                    <input id="couleurTrait" type="color" value="#111111"/>
+                </div>
+                <div class="form-group">
+                    <label for="couleurGrille" data-i18n="gridColor">Grid Color:</label>
+                    <input id="couleurGrille" type="color" value="#333333"/>
+                </div>
+                <div class="form-group">
+                    <label for="couleurReperes" data-i18n="markers">Markers:</label>
+                    <input id="couleurReperes" type="color" value="#FFBBBB"/>
+                </div>
             </div>
         </div>
     </section>
 </div>
 
 <!-- Scripts -->
+<script src="./js/generatedChords.js"></script>
 <script src="./js/NoteUtils.js"></script>
 <script src="./js/Instrument.js"></script>
 <script src="./js/ChordAnalyzer.js"></script>
+<script src="./js/GenerateChordData.js"></script>
 <script src="./js/i18n.js"></script>
 <script src="./js/accords.js"></script>
 <script src="./js/grille.js"></script>
