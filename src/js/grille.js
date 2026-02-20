@@ -15,6 +15,7 @@ class Grille {
   }
 
   dessineGrille() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const maxCasesVerticales = this.options.tailleGrilley;
     const maxCasesHorizontales = this.options.tailleGrillex;
 
@@ -22,10 +23,8 @@ class Grille {
 
     this.ctx.strokeStyle = this.options.couleurGrille;
     this.ctx.lineWidth = this.options.epaisseurLigne;
-    this.ctx.beginPath();
 
     this.dessinerLignes(maxCasesVerticales, maxCasesHorizontales);
-    this.ctx.stroke();
   }
 
 // Créer les points de la grille
@@ -46,84 +45,75 @@ class Grille {
     return points;
   }
 
-// Dessiner les lignes de la grille
+
   dessinerLignes(maxCasesVerticales, maxCasesHorizontales) {
+    // 1. Dessiner les lignes horizontales
     for (let y = 0; y < maxCasesVerticales; y++) {
-      for (let x = 0; x < maxCasesHorizontales; x++) {
-        this.dessinerLigneHorizontale(x, y, maxCasesHorizontales);
-        this.dessinerLigneVerticale(x, y, maxCasesVerticales);
+      this.ctx.beginPath();
+      
+      // Si c'est le sillet (y=0) et qu'on doit l'afficher
+      if (y === 0 && this.options.dessineSillet) {
+        this.ctx.lineWidth = this.options.epaisseurLigne * 2;
+      } else {
+        this.ctx.lineWidth = this.options.epaisseurLigne;
+      }
+
+      for (let x = 0; x < maxCasesHorizontales - 1; x++) {
+        const x1 = this.getx(x, y);
+        const y1 = this.gety(x, y);
+        const x2 = this.getx(x + 1, y);
+        const y2 = this.gety(x + 1, y);
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+      }
+      this.ctx.stroke();
+    }
+
+    // 2. Dessiner les lignes verticales
+    this.ctx.lineWidth = this.options.epaisseurLigne;
+    this.ctx.beginPath();
+    for (let x = 0; x < maxCasesHorizontales; x++) {
+      for (let y = 0; y < maxCasesVerticales - 1; y++) {
+        const x1 = this.getx(x, y);
+        const y1 = this.gety(x, y);
+        const x2 = this.getx(x, y + 1);
+        const y2 = this.gety(x, y + 1);
+        // On dépasse un peu pour que les angles soient propres
+        this.ctx.moveTo(x1, y1 - this.ctx.lineWidth / 2);
+        this.ctx.lineTo(x2, y2 + this.ctx.lineWidth / 2);
       }
     }
+    this.ctx.stroke();
   }
 
-// Dessiner une ligne horizontale
-  dessinerLigneHorizontale(x, y, maxCasesHorizontales) {
-    if (x < maxCasesHorizontales - 1) {
-      const x1 = this.getx(x, y);
-      const y1 = this.gety(x, y);
-      const x2 = this.getx(x + 1, y);
-      const y2 = this.gety(x + 1, y);
 
-      this.ctx.moveTo(x1, y1);
-      this.ctx.lineTo(x2, y2);
-
-      if (y === 0) {
-        // Premier trait horizontal deux fois plus épais
-        this.ctx.moveTo(
-            x1 - this.options.epaisseurLigne / 2,
-            y1 - this.options.epaisseurLigne
-        );
-        this.ctx.lineTo(
-            x2 + this.options.epaisseurLigne / 2,
-            y2 - this.options.epaisseurLigne
-        );
-      }
-    }
-  }
-
-// Dessiner une ligne verticale
-  dessinerLigneVerticale(x, y, maxCasesVerticales) {
-    if (y < maxCasesVerticales - 1) {
-      const x1 = this.getx(x, y);
-      const y1 = this.gety(x, y);
-      const x2 = this.getx(x, y + 1);
-      const y2 = this.gety(x, y + 1);
-
-      this.ctx.moveTo(x1, y1 - this.options.epaisseurLigne / 2);
-      this.ctx.lineTo(x2, y2 + this.options.epaisseurLigne / 2);
-    }
-  }
-
-  getx(x, y) {
+  getPoint(x, y, coord) {
     try {
-      return this.pointsGrille[x + this.options.tailleGrillex * y].x;
+      const point = this.pointsGrille[x + this.options.tailleGrillex * y];
+      if (!point) throw new Error(`Point (${x},${y}) inexistant`);
+      return point[coord];
     } catch (error) {
-      console.error(
-        `Erreur dans getx : x = ${x}, y = ${y}, message = ${error.message}`
-      );
-      throw error; // Rejette l'erreur après l'avoir loguée
+      console.error(`Erreur dans getPoint(${x}, ${y}, ${coord}) : ${error.message}`);
+      throw error;
     }
   }
 
-  gety(x, y) {
-    try {
-      return this.pointsGrille[x + this.options.tailleGrillex * y].y;
-    } catch (error) {
-      console.error(
-        `Erreur dans getx : x = ${x}, y = ${y}, message = ${error.message}`
-      );
-      throw error; // Rejette l'erreur après l'avoir loguée
-    }
-  }
+  getx(x, y) { return this.getPoint(x, y, 'x'); }
+  gety(x, y) { return this.getPoint(x, y, 'y'); }
 
+
+// ✅ Uniformiser et déclencher un redessin
   setCouleurGrille(couleurGrille) {
     this.options.couleurGrille = couleurGrille;
+    this.dessineGrille(); // redessiner
   }
 
   setTaille(maTaille) {
-    this.options.taille = maTaille;
     this.taille = maTaille;
+    this.options.taille = maTaille; // garder la synchro ou supprimer l'un des deux
+    this.dessineGrille();
   }
+
 }
 
 // Exporter les classes en tant qu'objet

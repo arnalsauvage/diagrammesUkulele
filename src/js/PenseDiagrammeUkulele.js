@@ -8,19 +8,22 @@ class PenseDiagrammeUkulele {
     // valeurs: tableau de 4 valeurs entières (de -1 à 18)
 
     constructor(nomAccord, valeurs, caseDepart) {
-        // Initialisation des attributs
+        this.valeurs = [0, 0, 0, 0];
         this.setCaseDepart(caseDepart);
         this.setNomAccord(nomAccord);
         this.setValeursByString(valeurs);
     }
 
     setValeursByString(maChaine) {
+        if (!maChaine) {
+            this.valeurs = [0, 0, 0, 0];
+            return;
+        }
         if (maChaine.length === CORDES_MAX) {
             this.convertitChaineSimple(maChaine);
         } else {
             this.convertitChaineComplexe(maChaine);
         }
-
     }
 
     getValeurCorde(numeroCorde) {
@@ -28,23 +31,19 @@ class PenseDiagrammeUkulele {
     }
 
     convertitChaineSimple(maChaine) {
-        this.valeurs = maChaine.split('').map(Number);
+        this.valeurs = maChaine.split('').map(val => val === 'x' ? -1 : parseInt(val, 10));
     }
 
     convertitChaineComplexe(maChaine) {
-        // Diviser la chaîne par les points pour obtenir un tableau de valeurs
         const valeursArray = maChaine.split('.');
-
-        // Vérifier que le tableau contient exactement 4 valeurs
         if (valeursArray.length !== CORDES_MAX) {
             throw new Error("La chaîne doit contenir exactement 4 valeurs séparées par des points.");
         }
-
-        // Convertir les valeurs en entiers et valider
         this.valeurs = valeursArray.map(val => {
-            const nombre = parseInt(val, 10); // Convertir en entier
+            if (val === 'x') return -1;
+            const nombre = parseInt(val, 10);
             if (!Number.isInteger(nombre) || nombre < -1 || nombre > 20) {
-                throw new Error("Chaque valeur doit être un entier entre -1 et 20.");
+                throw new Error("Chaque valeur doit être un entier entre -1 et 20 ou 'x'.");
             }
             return nombre;
         });
@@ -60,7 +59,6 @@ class PenseDiagrammeUkulele {
 
     setNomAccord(value) {
         if (typeof value === "string") {
-
             this.nomAccord = value;
         } else {
             throw new Error("nomAccord doit être une chaîne de caractères.");
@@ -68,135 +66,102 @@ class PenseDiagrammeUkulele {
     }
 
     chaineValeur() {
-        // Vérifier si toutes les valeurs sont comprises entre 0 et 9.
         if (!Array.isArray(this.valeurs)) {
             throw new Error("this.valeurs n'est pas un tableau.");
         }
-
-        // Vérifier si toutes les valeurs sont comprises entre 0 et 9.
         const toutesValides = this.valeurs.every(val => val >= 0 && val <= 9);
-
         if (toutesValides) {
-            // Si toutes les valeurs sont entre 0 et 9, créer une chaîne simple
-            return this.valeurs.join('');
+            return this.valeurs.map(v => v === -1 ? 'x' : v).join('');
         } else {
-            // Sinon, créer une chaîne avec les valeurs séparées par des points
-            return this.valeurs.join('.');
+            return this.valeurs.map(v => v === -1 ? 'x' : v).join('.');
         }
     }
 
-    // Cette méthode modifie la valeur de l'accord suite à un clic sur la grille
-    modifieValeursSurClic(relatifXDansGrille, relatifYDansGrille, caseDepart) {
-        // Modifier l'élément souhaité
-        if (relatifXDansGrille < this.valeurs.length) {
-            let absoluY = relatifYDansGrille + (caseDepart - 1);
-            this.valeurs[relatifXDansGrille] = absoluY.toString(); // Assurez-vous que relatifYDansGrille est converti en chaîne
-            console.log("Clic sur case " + absoluY);
+    modifieValeursSurClic(relatifXDansGrille, relatifYDansGrille, caseDepartEffective) {
+        if (relatifXDansGrille >= 0 && relatifXDansGrille < CORDES_MAX) {
+            // Si on clique sur la frette 0 (sillet), on alterne entre 0 et -1 (corde étouffée)
+            if (relatifYDansGrille === 0) {
+                this.valeurs[relatifXDansGrille] = (this.valeurs[relatifXDansGrille] === 0) ? -1 : 0;
+            } else {
+                let absoluY = relatifYDansGrille + (caseDepartEffective - 1);
+                // Si on reclique sur la même frette, on libère la corde (0)
+                this.valeurs[relatifXDansGrille] = (this.valeurs[relatifXDansGrille] === absoluY) ? 0 : absoluY;
+            }
         }
-        // Reconvertir le tableau en une chaîne et mettre à jour la valeur de l'élément
         return this.chaineValeur();
     }
 
-    // Calcule la case de départ qui semble le plus appropriée pour la position
     calculeCaseDepart() {
         let caseDepart = 1;
-
-        if (
-            this.getValeurCaseMin() > 1 &&
-            this.getValeurCaseMax() > 5
-        ) {
+        if (this.getValeurCaseMin() > 1 && this.getValeurCaseMax() > 5) {
             caseDepart = this.getValeurCaseMin();
         }
         return caseDepart;
     }
 
-    chercheAccordParNom(nomAccord) {
-        this.setNomAccord(nomAccord);
-        this.setValeursByString(tableauAccords[this.nomAccord]);
-    }
-
-    chercheAccordSuivant() {
-        // Trouver l'index de l'accord actuel dans le tableau
-        let index = Object.keys(tableauAccords).indexOf(this.nomAccord);
-
-        if (index !== Object.keys(tableauAccords).length - 1) {
-            // Passer à l'accord suivant (n+1)
-            index += 1;
-        } else {
-            index = 0;
+    chercheAccordParNom(nomAccord, dictionnaire = tableauAccords) {
+        if (dictionnaire[nomAccord]) {
+            this.setNomAccord(nomAccord);
+            this.setValeursByString(dictionnaire[nomAccord]);
+            return true;
         }
-        let prochainAccord = Object.keys(tableauAccords)[index];
-        this.valeurs = tableauAccords[prochainAccord];
-        this.nomAccord = prochainAccord;
-        console.log("Accord suivant: " + this.nomAccord);
-        this.chercheAccordParNom(this.nomAccord);
+        return false;
     }
 
-    chercheAccordPrecedent() {
-        let index = Object.keys(tableauAccords).indexOf(this.nomAccord);
+    chercheAccordSuivant(dictionnaire = tableauAccords) {
+        const keys = Object.keys(dictionnaire);
+        let index = keys.indexOf(this.nomAccord);
+        index = (index + 1) % keys.length;
+        this.chercheAccordParNom(keys[index], dictionnaire);
+    }
 
-        if (index > 0) {
+    chercheAccordPrecedent(dictionnaire = tableauAccords) {
+        const keys = Object.keys(dictionnaire);
+        let index = keys.indexOf(this.nomAccord);
+        if (index <= 0) {
+            index = keys.length - 1;
+        } else {
             index -= 1;
-        } else {
-            index = Object.keys(tableauAccords).length - 1;
         }
-
-        let accordPrecedent = Object.keys(tableauAccords)[index];
-        this.valeurs = tableauAccords[accordPrecedent];
-        this.nomAccord = accordPrecedent;
-        document.getElementById("name").value = this.nomAccord;
-        this.chercheAccordParNom(this.nomAccord);
-        console.log(`Accord précédent: ${this.nomAccord}`);
+        this.chercheAccordParNom(keys[index], dictionnaire);
     }
 
-    // Cherche la position donnée par chaine dans le dico d'accords, et donne un nom
-    chercheAccordParPosition(sPosition) {
+    chercheAccordParPosition(sPosition, dictionnaire = tableauAccords) {
         this.nomAccord = "non répertorié";
-        for (let key in tableauAccords) {
-            if (tableauAccords[key] === sPosition) {
+        for (let key in dictionnaire) {
+            if (dictionnaire[key] === sPosition) {
                 this.nomAccord = key;
                 break;
             }
         }
     }
 
-    getRandomInt(max) {
-        return Math.floor(Math.random() * max);
+    setAccordAuHasard(dictionnaire = tableauAccords) {
+        const accords = Object.keys(dictionnaire);
+        const numeroAccord = Math.floor(Math.random() * accords.length);
+        this.chercheAccordParNom(accords[numeroAccord], dictionnaire);
     }
 
-    // Tire un accord au hasard dans la bibliothèque !
-    setAccordAuHasard() {
-        const accords = Object.keys(tableauAccords);
-        let nombreDaccords = accords.length;
-        const numeroAccord = this.getRandomInt(nombreDaccords);
-        let saisieName = document.getElementById("name");
-        saisieName.value = accords[numeroAccord];
-        console.log("Saisiename : " + accords[numeroAccord]);
-        this.chercheAccordParNom(saisieName.value);
-    }
-
-    // trouve la frette la plus basse jouée dans l'accord
     getValeurCaseMin() {
         let valMin = CASE_MAX;
-        for (let compteur = 0; compteur < CORDES_MAX; compteur++) {
-            if (this.valeurs[compteur] > 0 && this.valeurs[compteur] < valMin) {
-                valMin = this.valeurs[compteur];
+        let aDesNotesAppuyees = false;
+        for (let i = 0; i < CORDES_MAX; i++) {
+            if (this.valeurs[i] > 0) {
+                if (this.valeurs[i] < valMin) valMin = this.valeurs[i];
+                aDesNotesAppuyees = true;
             }
         }
-        console.log("CaseMin  de " + this.valeurs + " = " + valMin);
-        return parseInt(valMin);
+        return aDesNotesAppuyees ? parseInt(valMin) : 1;
     }
 
-    // trouve la frette la plus haute jouée dans l'accord
     getValeurCaseMax() {
         let valMax = 0;
-        for (let compteur = 0; compteur < CORDES_MAX; compteur++) {
-            if (this.valeurs[compteur] > 0 && this.valeurs[compteur] > valMax) {
-                valMax = this.valeurs[compteur];
+        for (let i = 0; i < CORDES_MAX; i++) {
+            if (this.valeurs[i] > 0 && this.valeurs[i] > valMax) {
+                valMax = this.valeurs[i];
             }
         }
-        console.log("CaseMax  de " + this.valeurs + " = " + valMax);
         return parseInt(valMax);
     }
-
 }
+
