@@ -1,47 +1,69 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <title>Diagrammes ukulélé Top 5</title>
+<head>
+    <title>Grille d'accords Ukulélé</title>
     <meta charset="utf-8" />
     <link href="style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h1>Atelier grille ukulélé Top 5</h1>
-    <a href="pageDiagrammes.htm"> aller à la page diagrammes</a>
-    <br />
-    <script type="text/javascript">
-      function ajouteImagesAccords() {
-        document.getElementById("listeAccords").innerHTML = "";
-
-        var accordsSaisis = document.getElementById("accordsSaisis").value;
-        console.log("accordsSaisis : " + accordsSaisis);
-        accordsSaisis = accordsSaisis.split(" ");
-
-        for (var accord of accordsSaisis) {
-          console.log("afficheAcord : " + accord);
-          afficheAccordSaisi(accord);
+    <style>
+        .grid-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
         }
-        var br = document.createElement("br");
-        document.getElementById("listeAccords").appendChild(br);
-      }
-      function afficheAccordSaisi(nomAccord) {
-        var elem = document.createElement("img");
-        var dossier = "Accords/" + nomAccord[0];
-        if (nomAccord[1] == "b") dossier += "b";
-        if (nomAccord[1] == "#") {
-          nomAccord = nomAccord.replace("#", "%23");
-          dossier += "%23";
+        #accordsSaisis {
+            width: 100%;
+            max-width: 600px;
+            height: 80px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
-        elem.src = dossier + "/" + nomAccord + ".png";
-        // elem.setAttribute("height", "768");
-        elem.setAttribute("width", "200");
-        elem.setAttribute("alt", nomAccord);
-        document.getElementById("listeAccords").appendChild(elem);
-      }
-    </script>
-    Tape ici ta liste d'accords (ex : Am6 Bb7 C# )
-    <textarea id="accordsSaisis"> C C#dim7 Dm7 G7</textarea>
-    <button onclick="ajouteImagesAccords();">maj accords</button>
-    <div id="listeAccords"></div>
-  </body>
+        #listeAccords {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-selector">
+        <img src="https://flagcdn.com/w40/fr.png" class="lang-flag" data-lang="fr" alt="Français">
+        <img src="https://flagcdn.com/w40/gb.png" class="lang-flag" data-lang="en" alt="English">
+    </div>
+
+    <h1 data-i18n="generatorTitle">Générateur de Grille d'Accords</h1>
+    
+    <div class="nav-links">
+        <a href="pageDiagrammes.htm" data-i18n="navToAtelier">&larr; Retour à l'atelier</a>
+    </div>
+
+    <div class="main-container" style="display: block">
+        <div class="grid-controls">
+            <p data-i18n="inputPlaceholder">Saisissez vos accords séparés par des espaces :</p>
+            <textarea id="accordsSaisis">C C#dim7 Dm7 G7</textarea>
+            <button class="leBouton" id="btnMajAccords" data-i18n="generate">Générer la grille</button>
+        </div>
+
+        <div id="listeAccords"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./js/i18n.js"></script>
+    <script src="./js/accords.js"></script>
+    <script src="./js/grille.js"></script>
+    <script src="./js/couleurOutils.js"></script>
+    <script src="./js/PenseDiagrammeUkulele.js"></script>
+    <script src="./js/DessineDiagrammeUkulele.js"></script>
+    <script src="./js/pageAccords.js"></script>
+</body>
 </html>

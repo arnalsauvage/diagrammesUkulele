@@ -110,7 +110,36 @@ class DessineDiagrammeUkulele {
         this.ctx.lineWidth = this.grille.options.epaisseurLigne;
         this.metLesDoigts(caseDepartEffective);
         this.ecritNomAccord(this.penseDiagrammeUkulele.nomAccord);
+        this.updateStringNotes();
         this.ctx.stroke();
+    }
+
+    updateStringNotes() {
+        const display = document.getElementById("string-notes-display");
+        if (!display) return;
+
+        // On récupère les valeurs actuelles (tableau d'entiers)
+        const positions = this.penseDiagrammeUkulele.valeurs;
+        // On utilise notre instance globale UkuleleGCEA (définie dans Instrument.js)
+        const notes = UkuleleGCEA.getNotesForPosition(positions);
+
+        // Mise à jour de l'affichage HTML
+        display.innerHTML = notes.map(n => `<span>${n}</span>`).join('');
+
+        // Analyse de l'accord
+        const analyzer = new ChordAnalyzer(notes);
+        const analysisDisplay = document.getElementById("chord-analysis-display");
+        if (analysisDisplay) {
+            const chordName = analyzer.identifyChord();
+            const inversions = analyzer.getInversions();
+            const isPlayable = this.penseDiagrammeUkulele.estJouable();
+            const playableStatus = isPlayable 
+                ? '<span style="color: green">✅ Jouable</span>' 
+                : '<span style="color: red">❌ Trop difficile (écartement)</span>';
+
+            analysisDisplay.innerHTML = `<strong>Accord détecté : ${chordName}</strong> | ${playableStatus}<br/>
+                                        <small>Notes : ${inversions.map(inv => inv.join('-')).join(' | ')}</small>`;
+        }
     }
 
     repereSimple(numeroFretteDuRepere, fretteZeroDuDiagramme) {
@@ -207,28 +236,57 @@ class DessineDiagrammeUkulele {
 
     ecritNomAccord(nomAccord) {
         if (!nomAccord) return;
+        
         let tonale = nomAccord[0];
+        let alteration = "";
         let suffixe = nomAccord.slice(1);
+
+        // Découpage en 3 parties
+        if (nomAccord.length > 1 && (nomAccord[1] === '#' || nomAccord[1] === 'b')) {
+            alteration = nomAccord[1];
+            suffixe = nomAccord.slice(2);
+        }
         
         this.ctx.fillStyle = this.couleurOutils.couleurTrait;
         this.ctx.textAlign = "left";
         this.ctx.textBaseline = "ideographic";
 
+        // Définition des 3 tailles
         let tailleTonale = this.taille;
+        let tailleAlteration = this.taille * 0.75; // Taille intermédiaire
         let tailleSuffixe = this.taille * 0.6;
 
+        // Mesures
         this.ctx.font = `bold ${tailleTonale}px Verdana, Arial, serif`;
         let largeurTonale = this.ctx.measureText(tonale).width;
+        
+        this.ctx.font = `bold ${tailleAlteration}px Verdana, Arial, serif`;
+        let largeurAlteration = alteration ? this.ctx.measureText(alteration).width : 0;
+        
         this.ctx.font = `bold ${tailleSuffixe}px Verdana, Arial, serif`;
         let largeurSuffixe = this.ctx.measureText(suffixe).width;
 
-        let xCentre = this.canvas.width / 2;
-        let xTonale = xCentre - (largeurTonale + largeurSuffixe) / 2;
-        
+        // Calcul du centrage global
+        let largeurTotale = largeurTonale + largeurAlteration + largeurSuffixe;
+        let xCurrent = (this.canvas.width / 2) - (largeurTotale / 2);
+        let yBase = this.taille;
+
+        // 1. Dessiner la tonale
         this.ctx.font = `bold ${tailleTonale}px Verdana, Arial, serif`;
-        this.ctx.fillText(tonale, xTonale, this.taille);
+        this.ctx.fillText(tonale, xCurrent, yBase);
+        xCurrent += largeurTonale;
+
+        // 2. Dessiner l'altération (# ou b)
+        if (alteration) {
+            this.ctx.font = `bold ${tailleAlteration}px Verdana, Arial, serif`;
+            // On remonte un tout petit peu l'altération pour l'équilibre visuel
+            this.ctx.fillText(alteration, xCurrent, yBase * 0.95);
+            xCurrent += largeurAlteration;
+        }
+
+        // 3. Dessiner le suffixe
         this.ctx.font = `bold ${tailleSuffixe}px Verdana, Arial, serif`;
-        this.ctx.fillText(suffixe, xTonale + largeurTonale, this.taille);
+        this.ctx.fillText(suffixe, xCurrent, yBase);
     }
 
     clicSurDiagramme(event) {

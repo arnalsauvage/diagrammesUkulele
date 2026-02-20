@@ -1,148 +1,154 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Grille ukulélé Top 5</title>
+    <title>Atelier Diagrammes Ukulélé</title>
     <meta charset="utf-8"/>
     <link href="./style.css" rel="stylesheet"/>
 </head>
 <body>
-<h1>Atelier diagrammes ukulélé Top 5</h1>
-<a href="./pageAccords.htm">aller à la page "grille"</a>
-<br/>
-<br/>
-<canvas height="330" id="diagramme1" width="190"></canvas>
-<div class="form-group">
-    <label for="name">Nom de l'accord :</label>
-    <input id="name" maxlength="8" minlength="1" name="name" onkeyup="if(event.keyCode===13) chercherAccordParNom()"
-           size="8" type="text" value="Dm7"/>
-    <span aria-label="loupe" onclick="chercherAccordParNom()" role="img">🔍</span>
-    <img alt="infobulle icone" class="infobulle-icone" height="15" id="loupeChercheAccordParNom"
-         onmouseout="masquer_aide(document.getElementById('aide_nomaccord'))"
-         onmouseover="afficher_aide(document.getElementById('aide_nomaccord'))" src="./images/petite-info-bulle.png"
-         width="16"/>
-</div>
-<div class="infobulle">
-    <div class="infobulle-texte" id="aide_nomaccord" style="display: none"> A B C D E F G pour la si do re mi fa sol ,
-        <br/>b pour bémol, # pour dièse, <br/> Désignation des accords : A, Am, A7M pour la 7ème majeure Am7, Am7M pour la mineur 7ème majeur, Asus2
-        <br/> Asus4, Aaug pour la 5ème augmentée, Aaug7, Adim, Adim7, A5, A6, Am6
-    </div>
-</div>
-<div class="form-group">
-    <label for="valeurs">Valeurs (0 à 9):</label>
-    <input id="valeurs" maxlength="12" minlength="1" name="valeurs"
-           onkeyup="if(event.key==='Enter') chercherAccordParPosition()" size="4" type="text" value="2210"/>
-    <span id="loupeChercheAccordParValeurs" onclick="chercherAccordParPosition()">🔍</span>
-    <img alt="infobulle valeurs des cases" class="infobulle-icone" height="15" id="infobulle"
-         onmouseout="masquer_aide(document.getElementById('aide_valeur'))"
-         onmouseover="afficher_aide(document.getElementById('aide_valeur'))" src="./images/petite-info-bulle.png"
-         width="16"/>
-</div>
-<div id="popupMessage" style="display:none;position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);
-    background-color:#f8d7da;color:#721c24;padding:20px;border:1px solid #f5c6cb;border-radius:5px;
-    box-shadow:0 0 10px rgba(0,0,0,.1);z-index:1000">
-    <p> La case de départ que vous avez choisie ne correspond pas à la plage de notes. <br/> Certaines notes ne seront
-        pas affichées. </p>
-</div>
-<div class="infobulle">
-    <div class="infobulle-texte" id="aide_valeur" style="display: none">Ecris les valeurs des cases successives,
-        <br/>ex : 0003 pour C ou 2220 pour D.
-        <br/> Pour un accord avec des chiffres spéciaux, il faudra ajouter des points entre les chiffres : 0.10.11.12
-        <br/> les chiffres spéciaux : "-1" pour une corde non jouée, et 10 11 12 13 14...
-    </div>
-</div>
-<script>
-    function afficherPopup() {
-        document.getElementById("popupMessage").style.display = "block";
-    }
 
-    function masquerPopup() {
-        document.getElementById("popupMessage").style.display = "none";
-    }
-</script>
-<div class="form-group">
-    <label for="caseDepart">Case de départ (auto)</label>
-    <input id="caseDepart" max="12" min="1" onclick="dessineDiagramme();" style="display: none" type="number"
-           value="1"/>
-    <input checked id="caseDepartAuto" onchange="checkcaseDepartAuto(); dessineDiagramme();" type="checkbox"/>
+<div class="lang-selector">
+    <img src="https://flagcdn.com/w40/fr.png" class="lang-flag" data-lang="fr" alt="Français">
+    <img src="https://flagcdn.com/w40/gb.png" class="lang-flag" data-lang="en" alt="English">
 </div>
-<button class="leBouton" id="button-dessine" onclick="dessineDiagramme();"> dessine</button>
-<div>
-    <input id="couleurGrille" name="couleurGrille" type="color" value="#333333"/>
-    <label for="couleurGrille">couleur de traits pour la grille</label>
+
+<h1 data-i18n="title">Atelier Diagrammes Ukulélé</h1>
+
+<div class="nav-links">
+    <a href="./pageAccords.htm" data-i18n="navToGrid">Aller à la page Grille &rarr;</a>
 </div>
-<div>
-    <input id="couleurTrait" name="couleurTrait" type="color" value="#111111"/>
-    <label for="couleurTrait">couleur de traits pour les ronds</label>
+
+<div class="main-container">
+    <!-- Section de gauche : Le Diagramme -->
+    <section class="canvas-section">
+        <canvas id="diagramme1" height="330" width="190"></canvas>
+        
+        <!-- Affichage des notes calculées -->
+        <div id="string-notes-display" style="display: flex; gap: 15px; margin-top: 10px; font-family: monospace; font-weight: bold; font-size: 1.2rem; background: #eee; padding: 5px 15px; border-radius: 20px;">
+            <span>G</span><span>C</span><span>E</span><span>A</span>
+        </div>
+
+        <!-- Affichage de l'analyse d'accord -->
+        <div id="chord-analysis-display" style="margin-top: 10px; font-size: 0.9rem; color: #666; font-style: italic;">
+        </div>
+
+        <div id="popupMessage" style="display:none; margin-top: 15px; background-color:#f8d7da; color:#721c24; padding:15px; border:1px solid #f5c6cb; border-radius:5px;">
+            <p style="margin:0" data-i18n="errorFret">⚠️ La case de départ choisie ne permet pas d'afficher toutes les notes.</p>
+        </div>
+
+        <div class="button-bar">
+            <a class="leBouton" id="download" download="ukulele-chord.png" data-i18n="download">Download Image</a>
+            <button class="leBouton secondary" id="button-dessine" data-i18n="refresh">Refresh</button>
+        </div>
+    </section>
+
+    <!-- Section de droite : Les Contrôles -->
+    <section class="controls-section">
+        
+        <div class="control-group">
+            <h3 data-i18n="chordDefinition">Chord Definition</h3>
+            <div class="form-group">
+                <label for="name" data-i18n="name">Name:</label>
+                <input id="name" maxlength="8" name="name" type="text" value="Dm7"/>
+                <span id="toggle-assistant" style="cursor: pointer; font-size: 1.2rem; margin-left: 5px;" title="Assistant">🪄</span>
+                <img alt="info" class="infobulle-icone" height="16" id="loupeChercheAccordParNom" src="./images/petite-info-bulle.png" width="16"/>
+                <div class="infobulle-texte" id="aide_nomaccord" style="display: none" data-i18n="helpName">
+                </div>
+            </div>
+
+            <!-- Assistant de nom d'accord -->
+            <div class="chord-assistant" id="chord-assistant" style="display: none">
+                <div class="assistant-row" id="assistant-roots">
+                    <button class="mini-btn" data-val="C">C</button>
+                    <button class="mini-btn" data-val="D">D</button>
+                    <button class="mini-btn" data-val="E">E</button>
+                    <button class="mini-btn" data-val="F">F</button>
+                    <button class="mini-btn" data-val="G">G</button>
+                    <button class="mini-btn" data-val="A">A</button>
+                    <button class="mini-btn" data-val="B">B</button>
+                </div>
+                <div class="assistant-row" id="assistant-accidentals">
+                    <button class="mini-btn secondary" data-val="">♮</button>
+                    <button class="mini-btn secondary" data-val="#">#</button>
+                    <button class="mini-btn secondary" data-val="b">b</button>
+                </div>
+                <div class="assistant-row" id="assistant-families">
+                    <button class="mini-btn family" data-val="">Maj</button>
+                    <button class="mini-btn family" data-val="m">m</button>
+                    <button class="mini-btn family" data-val="7">7</button>
+                    <button class="mini-btn family" data-val="m7">m7</button>
+                    <button class="mini-btn family" data-val="7M">7M</button>
+                    <button class="mini-btn family" data-val="m7M">m7M</button>
+                    <button class="mini-btn family" data-val="sus2">sus2</button>
+                    <button class="mini-btn family" data-val="sus4">sus4</button>
+                    <button class="mini-btn family" data-val="dim">dim</button>
+                    <button class="mini-btn family" data-val="dim7">dim7</button>
+                    <button class="mini-btn family" data-val="aug">aug</button>
+                    <button class="mini-btn family" data-val="6">6</button>
+                    <button class="mini-btn family" data-val="m6">m6</button>
+                    <button class="mini-btn family" data-val="5">5</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="valeurs" data-i18n="position">Position:</label>
+                <input id="valeurs" maxlength="12" name="valeurs" type="text" value="2210"/>
+                <img alt="info" class="infobulle-icone" height="16" id="infobulle" src="./images/petite-info-bulle.png" width="16"/>
+                <div class="infobulle-texte" id="aide_valeur" style="display: none" data-i18n="helpValue">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="caseDepartAuto" data-i18n="autoFret">Auto Fret:</label>
+                <input checked id="caseDepartAuto" type="checkbox"/>
+                <input id="caseDepart" max="12" min="1" style="display: none; margin-left: 10px; width: 60px" type="number" value="1"/>
+            </div>
+            
+            <div class="button-bar" style="justify-content: flex-start">
+                <button class="leBouton" id="btnPrecChord" data-i18n="prev">&larr; Prev</button>
+                <button class="leBouton" id="randomChord" data-i18n="random">Random</button>
+                <button class="leBouton" id="btnNextChord" data-i18n="next">Next &rarr;</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3 data-i18n="appearance">Appearance</h3>
+            <div class="form-group">
+                <label for="fader" data-i18n="size">Size:</label>
+                <input id="fader" max="70" min="20" name="ftempo" step="1" type="range" value="40"/>
+                <output id="taille" style="margin-left: 10px; font-weight: bold">40</output>
+            </div>
+            <div class="form-group">
+                <label for="couleurRemplissage" data-i18n="dotFill">Dot Fill:</label>
+                <input id="couleurRemplissage" type="color" value="#FF5555"/>
+            </div>
+            <div class="form-group">
+                <label for="couleurTrait" data-i18n="dotOutline">Dot Outline:</label>
+                <input id="couleurTrait" type="color" value="#111111"/>
+            </div>
+            <div class="form-group">
+                <label for="couleurGrille" data-i18n="gridColor">Grid Color:</label>
+                <input id="couleurGrille" type="color" value="#333333"/>
+            </div>
+            <div class="form-group">
+                <label for="couleurReperes" data-i18n="markers">Markers:</label>
+                <input id="couleurReperes" type="color" value="#FFBBBB"/>
+            </div>
+        </div>
+    </section>
 </div>
-<div>
-    <input id="couleurRemplissage" name="couleurRemplissage" type="color" value="#FF5555"/>
-    <label for="couleurRemplissage">couleur de remplissage pour les ronds</label>
-</div>
-<div>
-    <input id="couleurReperes" name="couleurReperes" type="color" value="#FFBBBB"/>
-    <label for="couleurReperes">couleur des repères sur le manche</label>
-</div>
-<div class="row">
-    <label class="inline col-sm-3" for="fader">Taille :</label>
-    <div class="col-sm-5">
-        <input id="fader" max="50" min="10" name="ftempo" oninput="outputUpdate(value)" step="1" type="range"
-               value="40"/>
-        <output class="inline col-sm-2" for="fader" id="taille">40</output>
-    </div>
-</div>
-<div>
-    <a class="leBouton" download="myImage.jpg" id="download"
-       onclick="console.log('Test de clic'); diagramme.download_img(this);">Télécharger Diagramme</a>
-    <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();"> Accord au hasard</button>
-    <button class="leBouton" id="btnPrecChord" onclick="diagramme.chercheAccordPrecedent();"> Accord précédent</button>
-    <button class="leBouton" id="btnNextChord" onclick="diagramme.chercheAccordSuivant();"> Accord suivant</button>
-</div>
-<!-- Chargé en premier -->
+
+<!-- Scripts -->
+<script src="./js/NoteUtils.js"></script>
+<script src="./js/Instrument.js"></script>
+<script src="./js/ChordAnalyzer.js"></script>
+<script src="./js/i18n.js"></script>
 <script src="./js/accords.js"></script>
 <script src="./js/grille.js"></script>
 <script src="./js/couleurOutils.js"></script>
 <script src="./js/PenseDiagrammeUkulele.js"></script>
 <script src="./js/DessineDiagrammeUkulele.js"></script>
 <script src="./js/diagrammesv2.js"></script>
-<script>
-    function chercherAccordParNom() {
-        const nom = document.getElementById("name").value;
-        diagramme.chercheAccordParNom(nom);
-    }
 
-    function chercherAccordParPosition() {
-        const valeurs = document.getElementById("valeurs").value;
-        diagramme.chercheAccordParPosition(valeurs);
-        diagramme.dessineDiagramme();
-    }
-
-    function dessineDiagramme() {
-        window.diagramme.majVersPense();
-        window.diagramme.dessineDiagramme();
-    }
-
-    function checkcaseDepartAuto() {
-        const caseDepart = document.getElementById("caseDepart");
-        caseDepart.style.display = document.getElementById("caseDepartAuto").checked ? "none" : "inline-block";
-    }
-
-    function setAccordAuHasard() {
-        diagramme.setAccordAuHasard();
-    }
-
-    function outputUpdate(nouvelleTaille) {
-        document.querySelector("#taille").value = nouvelleTaille;
-        diagramme.changeTaille(nouvelleTaille);
-        dessineDiagramme();
-    }
-
-    function afficher_aide(aide) {
-        aide.style.display = "inline";
-    }
-
-    function masquer_aide(aide) {
-        aide.style.display = "none";
-    }
-</script>
 </body>
 </html>
