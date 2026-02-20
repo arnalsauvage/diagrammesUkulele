@@ -236,19 +236,31 @@ class DessineDiagrammeUkulele {
             title.innerHTML = msg;
         }
 
-        // --- NEW LOGIC: Check favorite status for each position string ---
-        // This assumes that getFavorites() is globally available from diagrammesv2.js
+        // --- NEW LOGIC: Sort positions by favorites first ---
         const currentFavorites = globalThis.getFavorites ? globalThis.getFavorites() : [];
+        
+        // Créer un tableau d'objets pour trier
+        const posObjects = fullPositions.map(pos => ({
+            pos: pos,
+            isFavorite: currentFavorites.includes(pos)
+        }));
 
-        fullPositions.forEach((pos, index) => {
+        // Trier : favoris en premier
+        posObjects.sort((a, b) => {
+            if (a.isFavorite && !b.isFavorite) return -1;
+            if (!a.isFavorite && b.isFavorite) return 1;
+            return 0;
+        });
+
+        posObjects.forEach((obj, index) => {
+            const pos = obj.pos;
+            const isPosFavorite = obj.isFavorite;
             const wrapper = document.createElement("div");
             wrapper.style.cursor = "pointer";
             wrapper.style.border = "1px solid #ddd";
             wrapper.style.borderRadius = "4px";
             wrapper.style.padding = "2px";
             
-            // --- NEW: Check if this specific position is a favorite ---
-            const isPosFavorite = currentFavorites.includes(pos);
             wrapper.style.background = isPosFavorite ? "#e8f5e9" : "white"; // Highlight if favorite
 
             const canvas = document.createElement("canvas");
@@ -292,6 +304,66 @@ class DessineDiagrammeUkulele {
                 if (globalThis.updateFavoriteIconState) {
                     globalThis.updateFavoriteIconState();
                 }
+            });
+        });
+    }
+
+    displaySearchList(resultsArray) {
+        if (this.options.isMiniature) return;
+
+        const container = document.getElementById("alternatives-container");
+        const title = document.getElementById("alternatives-title");
+        if (!container) return;
+        
+        container.innerHTML = "";
+        if (title) {
+            title.style.display = "block";
+            // On réutilise le message des alternatives ou on en met un générique
+            title.innerHTML = `Suggestions (${resultsArray.length})`;
+        }
+
+        resultsArray.forEach((res) => {
+            const wrapper = document.createElement("div");
+            wrapper.style.cursor = "pointer";
+            wrapper.style.border = "1px solid #ddd";
+            wrapper.style.borderRadius = "4px";
+            wrapper.style.padding = "2px";
+            wrapper.style.background = res.isFavorite ? "#fff9c4" : "white"; // Fond légèrement jaune pour les favoris
+            if (res.isFavorite) wrapper.style.borderColor = "gold";
+
+            const canvas = document.createElement("canvas");
+            canvas.width = 60;
+            canvas.height = 90;
+            
+            wrapper.appendChild(canvas);
+            container.appendChild(wrapper);
+
+            const miniOptions = {
+                taille: 12,
+                tailleGrillex: 4,
+                tailleGrilley: 6,
+                margeHauteurGrille: 15,
+                margeGaucheGrille: 8,
+                epaisseurLigne: 1,
+                couleurGrille: "#666",
+                bGrilleTordue: false,
+                isMiniature: true,
+                isFavorite: res.isFavorite
+            };
+
+            const miniDiag = new DessineDiagrammeUkulele(canvas, miniOptions);
+            miniDiag.penseDiagrammeUkulele.setNomAccord(res.name);
+            miniDiag.penseDiagrammeUkulele.setValeursByString(res.position);
+            miniDiag.dessineDiagramme();
+
+            wrapper.addEventListener("click", () => {
+                this.inputValeurs.value = res.position;
+                this.inputNomAccord.value = res.name;
+                this.penseDiagrammeUkulele.setNomAccord(res.name);
+                this.penseDiagrammeUkulele.setValeursByString(res.position);
+                this.dessineDiagramme();
+                if (globalThis.updateMainDiagramFavoriteStatus) globalThis.updateMainDiagramFavoriteStatus();
+                if (globalThis.updateFavoriteIconState) globalThis.updateFavoriteIconState();
             });
         });
     }
