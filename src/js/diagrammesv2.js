@@ -1,4 +1,101 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // --- Favorites Logic ---
+    const FAVORITES_STORAGE_KEY = 'ukuleleChordFavorites'; // Stores position strings like "0232"
+
+    // --- Global helper functions for favorites ---
+    // These are made global so they can be accessed by DessineDiagrammeUkulele methods.
+    globalThis.getFavorites = () => {
+        const favoritesJson = localStorage.getItem(FAVORITES_STORAGE_KEY);
+        return favoritesJson ? JSON.parse(favoritesJson) : [];
+    };
+
+    const saveFavorites = (favorites) => {
+        localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+    };
+
+    // Takes a position string (e.g., "0232")
+    globalThis.addFavorite = (positionString) => {
+        if (!positionString) return;
+        const favorites = globalThis.getFavorites();
+        if (!favorites.includes(positionString)) {
+            favorites.push(positionString);
+            saveFavorites(favorites);
+            console.log(`[Favorites] Added favorite position: ${positionString}`);
+        }
+    };
+
+    // Takes a position string (e.g., "0232")
+    globalThis.removeFavorite = (positionString) => {
+        if (!positionString) return;
+        let favorites = globalThis.getFavorites();
+        favorites = favorites.filter(fav => fav !== positionString);
+        saveFavorites(favorites);
+        console.log(`[Favorites] Removed favorite position: ${positionString}`);
+    };
+
+    // Takes a position string (e.g., "0232")
+    globalThis.isFavorite = (positionString) => {
+        // console.log(`[Favorites] Checking if position "${positionString}" is favorite.`); // Debugging log
+        if (!positionString) {
+            // console.log(`[Favorites] Position string is empty, returning false.`); // Debugging log
+            return false;
+        }
+        const favorites = globalThis.getFavorites();
+        const isFav = favorites.includes(positionString);
+        // console.log(`[Favorites] Found favorites: [${favorites.join(', ')}]. Is "${positionString}" favorite? ${isFav}`); // Debugging log
+        return isFav;
+    };
+    // --- End Global Favorites Logic ---
+
+
+    // Helper to convert current diagram's values to position string
+    const getCurrentPositionString = () => {
+        const diagram = globalThis.diagramme;
+        // Ensure diagram and its penseDiagrammeUkulele are initialized and have values
+        if (!diagram || !diagram.penseDiagrammeUkulele || !Array.isArray(diagram.penseDiagrammeUkulele.valeurs)) return null;
+        // Convert array [0, 2, 3, 2] to string "0232" (simple format) or "0.2.3.2" (complex format)
+        // This should match the format stored in localStorage and tableauAccords
+        // PenseDiagrammeUkulele.chaineValeur() handles this formatting.
+        return diagram.penseDiagrammeUkulele.chaineValeur();
+    };
+
+    // Updates the star icon state (☆/★) based on the CURRENTLY DISPLAYED DIAGRAM'S POSITION
+    // This function is now global so it can be called from DessineDiagrammeUkulele.showAlternatives
+    globalThis.updateFavoriteIconState = () => {
+        const favoriteToggle = document.getElementById('favorite-toggle');
+        const currentPositionStr = getCurrentPositionString();
+
+        if (favoriteToggle && currentPositionStr) {
+            if (globalThis.isFavorite(currentPositionStr)) {
+                favoriteToggle.textContent = '★'; // Filled star
+                favoriteToggle.style.color = 'gold';
+            } else {
+                favoriteToggle.textContent = '☆'; // Unfilled star
+                favoriteToggle.style.color = 'inherit'; // Default color
+            }
+        } else if (favoriteToggle) {
+            // If no valid position, reset icon
+            favoriteToggle.textContent = '☆';
+            favoriteToggle.style.color = 'inherit';
+        }
+    };
+
+    // --- Function to update the main diagram's favorite status ---
+    // This is crucial because the DessineDiagrammeUkulele instance has its own `isFavorite` property.
+    // This function is now global so it can be called from DessineDiagrammeUkulele.showAlternatives
+    globalThis.updateMainDiagramFavoriteStatus = () => {
+        const currentPositionStr = getCurrentPositionString();
+        const diagram = globalThis.diagramme;
+        if (diagram) {
+            // Update the instance's property based on the current position's favorite status
+            diagram.isFavorite = globalThis.isFavorite(currentPositionStr);
+            // Re-draw the main diagram to show/hide the star if its favorite status changed.
+            diagram.dessineDiagramme(); 
+        }
+    };
+    // --- End Global Favorite Update Functions ---
+
+
     // 1. Initialisation des options par défaut
     const options = {
         taille: 40,
@@ -11,34 +108,74 @@ document.addEventListener("DOMContentLoaded", () => {
         bGrilleTordue: true,
     };
 
-    // 2. Création et démarrage de l'instance globale
-    window.diagramme = new DessineDiagrammeUkulele("diagramme1", options);
-    window.diagramme.startup();
+    // 2. Création et démarrage de l'instance globale du diagramme principal
+    globalThis.diagramme = new DessineDiagrammeUkulele("diagramme1", options);
+    globalThis.diagramme.startup();
 
-    // 3. Liaison des événements UI (Nettoyage des onclick HTML)
-    
-    // Accords par Nom
+    // --- Initial UI Setup and State Update ---
+    // Ensure initial state reflects loaded data and favorites
+    globalThis.updateMainDiagramFavoriteStatus(); // Set initial favorite status for the main diagram
+    globalThis.updateFavoriteIconState(); // Set initial state for the toggle button
+
+
+    // --- Liaison des événements UI ---
+
     const inputName = document.getElementById("name");
-    inputName.addEventListener("keyup", (e) => {
-        if (e.key === "Enter") window.diagramme.chercheAccordParNom();
-    });
-    document.querySelector("span[onclick='chercherAccordParNom()']")?.addEventListener("click", () => {
-        window.diagramme.chercheAccordParNom();
-    });
+    const inputValeurs = document.getElementById("valeurs"); 
+    
+    // Function to handle updates after chord data changes (search, input, etc.)
+    const handleChordUpdate = () => {
+        // Update the internal model from UI inputs if they were changed directly
+        // globalThis.diagramme.syncUIToPense(); // This might be redundant if inputs are updated by chercheAccordParNom
 
-    // Accords par Valeurs (Position)
-    const inputValeurs = document.getElementById("valeurs");
-    inputValeurs.addEventListener("keyup", (e) => {
-        if (e.key === "Enter") window.diagramme.chercheAccordParPosition();
-    });
-    document.getElementById("loupeChercheAccordParValeurs")?.addEventListener("click", () => {
-        window.diagramme.chercheAccordParPosition();
-    });
+        globalThis.diagramme.dessineDiagramme(); // Redraw the main diagram
+        globalThis.updateMainDiagramFavoriteStatus(); // Update the main diagram's star visibility
+        globalThis.updateFavoriteIconState(); // Update the toggle button star (☆/★)
+        
+        // After a change, re-render alternatives to update their favorite highlighting
+        const currentChordName = inputName.value;
+        if (currentChordName && globalThis.diagramme.showAlternatives) {
+            globalThis.diagramme.showAlternatives(currentChordName);
+        }
+    };
 
-    // Bouton Dessine
+    // Accords par Nom Input & Search
+    inputName.addEventListener("input", () => { 
+        // Trigger the search. The modified function will update the main chord display.
+        // The return value of chercheAccordParNom is not directly used here to display a list,
+        // but the internal state update and selection of the best match is handled.
+        const searchResult = globalThis.diagramme.chercheAccordParNom(inputName.value); // Pass the input value
+        handleChordUpdate(); // Update UI based on the new main chord selected by the search
+    });
+    const searchByNameIcon = document.querySelector("span[onclick='chercherAccordParNom()']");
+    if (searchByNameIcon) {
+        searchByNameIcon.addEventListener("click", () => {
+            const searchResult = globalThis.diagramme.chercheAccordParNom(inputName.value);
+            handleChordUpdate();
+        });
+    }
+
+    // Accords par Valeurs (Position) Input & Search
+    inputValeurs.addEventListener("input", () => { 
+        // When position input changes, update and redraw.
+        globalThis.diagramme.chercheAccordParPosition(inputValeurs.value); // Update chord name based on position
+        handleChordUpdate();
+    });
+    const searchByPosIcon = document.getElementById("loupeChercheAccordParValeurs");
+    if (searchByPosIcon) {
+        searchByPosIcon.addEventListener("click", () => {
+            // This calls PenseDiagrammeUkulele.chercheAccordParPosition which updates only the name, not the main chord display itself.
+            // A redraw is needed.
+            globalThis.diagramme.chercheAccordParPosition(inputValeurs.value); 
+            handleChordUpdate();
+        });
+    }
+
+    // Bouton Dessine (Manual Draw)
     document.getElementById("button-dessine").addEventListener("click", () => {
-        window.diagramme.syncUIToPense();
-        window.diagramme.dessineDiagramme();
+        // This syncs UI inputs to the PenseDiagrammeUkulele model and then redraws.
+        globalThis.diagramme.syncUIToPense(); 
+        handleChordUpdate(); // Redraw and update states
     });
 
     // Case de départ Auto
@@ -49,14 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     checkAuto.addEventListener("change", () => {
         toggleCaseInput();
-        window.diagramme.syncUIToPense();
-        window.diagramme.dessineDiagramme();
+        globalThis.diagramme.syncUIToPense(); // Update internal model based on auto/manual setting
+        handleChordUpdate(); // Redraw and update states
     });
     inputCase.addEventListener("change", () => {
-        window.diagramme.syncUIToPense();
-        window.diagramme.dessineDiagramme();
+        globalThis.diagramme.syncUIToPense(); // Update internal model
+        handleChordUpdate(); // Redraw and update states
     });
-    toggleCaseInput(); // État initial
+    toggleCaseInput(); // Set initial state
 
     // Sliders et Couleurs
     const fader = document.getElementById("fader");
@@ -64,19 +201,22 @@ document.addEventListener("DOMContentLoaded", () => {
     fader.addEventListener("input", (e) => {
         const nouvelleTaille = e.target.value;
         outputTaille.value = nouvelleTaille;
-        window.diagramme.changeTaille(nouvelleTaille);
-        window.diagramme.dessineDiagramme();
+        globalThis.diagramme.changeTaille(nouvelleTaille);
+        globalThis.diagramme.dessineDiagramme(); // Just redraw, no state change needed here
     });
 
     // Boutons d'actions
     document.getElementById("randomChord").addEventListener("click", () => {
-        window.diagramme.setAccordAuHasard();
+        globalThis.diagramme.setAccordAuHasard(); // Updates main chord display
+        handleChordUpdate(); // Update UI states
     });
     document.getElementById("btnPrecChord").addEventListener("click", () => {
-        window.diagramme.chercheAccordPrecedent();
+        globalThis.diagramme.chercheAccordPrecedent(); // Updates main chord display
+        handleChordUpdate(); // Update UI states
     });
     document.getElementById("btnNextChord").addEventListener("click", () => {
-        window.diagramme.chercheAccordSuivant();
+        globalThis.diagramme.chercheAccordSuivant(); // Updates main chord display
+        handleChordUpdate(); // Update UI states
     });
 
     // Générateur de Base de Données
@@ -93,23 +233,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Téléchargement
     document.getElementById("download").addEventListener("click", function(e) {
-        window.diagramme.download_img(this);
+        globalThis.diagramme.download_img(this);
     });
 
     // --- Logique de l'Assistant d'Accords ---
     const assistant = document.getElementById('chord-assistant');
     const toggleBtn = document.getElementById('toggle-assistant');
-    
-    toggleBtn.addEventListener('click', () => {
-        const isHidden = assistant.style.display === 'none';
-        assistant.style.display = isHidden ? 'block' : 'none';
-        toggleBtn.style.filter = isHidden ? 'drop-shadow(0 0 5px var(--primary-color))' : 'none';
-    });
+
+    if (toggleBtn && assistant) {
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = assistant.style.display === 'none';
+            assistant.style.display = isHidden ? 'block' : 'none';
+            toggleBtn.style.filter = isHidden ? 'drop-shadow(0 0 5px var(--primary-color))' : 'none';
+        });
+    }
 
     // --- Basculement des contrôles de couleur ---
     const colorControls = document.getElementById('color-controls');
     const toggleColorsBtn = document.getElementById('toggle-colors');
-    
+
     if (toggleColorsBtn && colorControls) {
         toggleColorsBtn.addEventListener('click', () => {
             const isHidden = colorControls.style.display === 'none';
@@ -118,36 +260,64 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // --- Favorite Toggle Event Listener ---
+    const favoriteToggle = document.getElementById('favorite-toggle');
+    if (favoriteToggle) {
+        favoriteToggle.addEventListener('click', () => {
+            const currentPositionStr = getCurrentPositionString();
+            if (currentPositionStr) {
+                if (globalThis.isFavorite(currentPositionStr)) {
+                    globalThis.removeFavorite(currentPositionStr);
+                } else {
+                    globalThis.addFavorite(currentPositionStr);
+                }
+                // Update the toggle button and main diagram's star status
+                globalThis.updateFavoriteIconState(); 
+                globalThis.updateMainDiagramFavoriteStatus(); 
+                
+                // Also re-render alternatives to update their background highlighting
+                const currentChordName = inputName.value;
+                if (currentChordName && globalThis.diagramme && globalThis.diagramme.showAlternatives) {
+                    globalThis.diagramme.showAlternatives(currentChordName);
+                }
+            }
+        });
+    }
+    // --- End Favorite Toggle Event Listener ---
+
     let selection = { root: 'C', accidental: '', family: '' };
 
     const updateAccidentalAvailability = () => {
         const sharpBtn = document.querySelector('#assistant-accidentals .mini-btn[data-val="#"]');
         const flatBtn = document.querySelector('#assistant-accidentals .mini-btn[data-val="b"]');
-        
-        // B et E n'ont pas de dièse (théorique simple)
+        const naturalBtn = document.querySelector('#assistant-accidentals .mini-btn[data-val=""]');
+
         const sharpForbidden = (selection.root === 'B' || selection.root === 'E');
-        // F et C n'ont pas de bémol (théorique simple)
         const flatForbidden = (selection.root === 'F' || selection.root === 'C');
 
-        if (sharpBtn) {
-            sharpBtn.disabled = sharpForbidden;
-            sharpBtn.style.opacity = sharpForbidden ? "0.3" : "1";
-            sharpBtn.style.pointerEvents = sharpForbidden ? "none" : "auto";
-            if (sharpForbidden && selection.accidental === '#') selection.accidental = '';
-        }
+        // Helper to update button state and selection if needed
+        const updateButtonState = (button, isForbidden, accidentalValue) => {
+            if (!button) return;
+            button.disabled = isForbidden;
+            button.style.opacity = isForbidden ? "0.3" : "1";
+            button.style.pointerEvents = isForbidden ? "none" : "auto";
+            if (isForbidden && selection.accidental === accidentalValue) {
+                selection.accidental = ''; // Reset to natural if the current accidental is forbidden
+            }
+        };
 
-        if (flatBtn) {
-            flatBtn.disabled = flatForbidden;
-            flatBtn.style.opacity = flatForbidden ? "0.3" : "1";
-            flatBtn.style.pointerEvents = flatForbidden ? "none" : "auto";
-            if (flatForbidden && selection.accidental === 'b') selection.accidental = '';
-        }
+        updateButtonState(sharpBtn, sharpForbidden, '#');
+        updateButtonState(flatBtn, flatForbidden, 'b');
 
-        // Mettre à jour l'état actif du bouton "Naturel" si on a dû annuler une altération
+        // Update active state for accidental buttons
+        const accidentalButtons = document.querySelectorAll('#assistant-accidentals .mini-btn');
+        accidentalButtons.forEach(btn => btn.classList.remove('active'));
+
         if (selection.accidental === '') {
-            const naturalBtn = document.querySelector('#assistant-accidentals .mini-btn[data-val=""]');
-            document.querySelectorAll('#assistant-accidentals .mini-btn').forEach(b => b.classList.remove('active'));
             if (naturalBtn) naturalBtn.classList.add('active');
+        } else {
+            const activeAccidentalBtn = document.querySelector(`#assistant-accidentals .mini-btn[data-val="${selection.accidental}"]`);
+            if (activeAccidentalBtn) activeAccidentalBtn.classList.add('active');
         }
     };
 
@@ -155,25 +325,27 @@ document.addEventListener("DOMContentLoaded", () => {
         updateAccidentalAvailability();
         const fullName = selection.root + selection.accidental + selection.family;
         inputName.value = fullName;
-        window.diagramme.chercheAccordParNom();
+        // Trigger search and update UI states
+        const searchResult = globalThis.diagramme.chercheAccordParNom(fullName); 
+        handleChordUpdate(); 
     };
 
     const setupAssistantGroup = (rowId, selectionKey) => {
         const buttons = document.querySelectorAll(`#${rowId} .mini-btn`);
+
+        const handleButtonClick = (btn) => {
+            selection[selectionKey] = btn.dataset.val; 
+
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            updateFromAssistant();
+        };
+
         buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Update selection
-                selection[selectionKey] = btn.getAttribute('data-val');
-                
-                // Update active state
-                buttons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                updateFromAssistant();
-            });
-            
-            // Initial active state
-            if (btn.getAttribute('data-val') === selection[selectionKey]) {
+            btn.addEventListener('click', () => handleButtonClick(btn));
+
+            if (btn.dataset.val === selection[selectionKey]) {
                 btn.classList.add('active');
             }
         });
@@ -182,16 +354,21 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAssistantGroup('assistant-roots', 'root');
     setupAssistantGroup('assistant-accidentals', 'accidental');
     setupAssistantGroup('assistant-families', 'family');
-// --- Infobulles (Aide) ---
-  const setupAide = (iconeId, aideId) => {
-    const icone = document.getElementById(iconeId);
-    const aide = document.getElementById(aideId);
-    if (icone && aide) {
-      icone.addEventListener("mouseover", () => aide.style.display = "inline");
-      icone.addEventListener("mouseout", () => aide.style.display = "none");
-    }
-  };
+    
+    // --- Infobulles (Aide) ---
+    const setupAide = (iconeId, aideId) => {
+        const icone = document.getElementById(iconeId);
+        const aide = document.getElementById(aideId);
+        if (icone && aide) {
+            icone.addEventListener("mouseover", () => aide.style.display = "inline");
+            icone.addEventListener("mouseout", () => aide.style.display = "none");
+        }
+    };
 
-  setupAide("loupeChercheAccordParNom", "aide_nomaccord");
-  setupAide("infobulle", "aide_valeur");
+    setupAide("loupeChercheAccordParNom", "aide_nomaccord");
+    setupAide("infobulle", "aide_valeur");
+
+    // Initialize state on load (already done above, but as a reminder)
+    // globalThis.updateMainDiagramFavoriteStatus();
+    // globalThis.updateFavoriteIconState();
 });

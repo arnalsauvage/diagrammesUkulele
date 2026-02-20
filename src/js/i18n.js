@@ -111,15 +111,15 @@ class I18n {
     }
 }
 
-window.i18n = new I18n();
+globalThis.i18n = new I18n();
 
 document.addEventListener("DOMContentLoaded", () => {
-    window.i18n.translatePage();
+    globalThis.i18n.translatePage();
     
     // Ajout des écouteurs sur les drapeaux (s'ils existent)
     document.querySelectorAll('.lang-flag').forEach(flag => {
         flag.addEventListener('click', () => {
-            window.i18n.setLang(flag.getAttribute('data-lang'));
+            globalThis.i18n.setLang(flag.getAttribute('data-lang'));
         });
     });
 });

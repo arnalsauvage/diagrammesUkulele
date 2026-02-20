@@ -1,4 +1,3 @@
-
 class DessineDiagrammeUkulele {
     constructor(canvasOrId, options) {
         this.canvas = (typeof canvasOrId === 'string') 
@@ -21,7 +20,12 @@ class DessineDiagrammeUkulele {
         // Initialiser les dimensions et marges
         this.changeTaille(this.taille);
 
-        if (!options.isMiniature) {
+        // --- New: Favorite status for this specific diagram instance ---
+        this.isFavorite = options.isFavorite || false; 
+
+        if (options.isMiniature) {
+            this.penseDiagrammeUkulele = new PenseDiagrammeUkulele("", "0000", -1);
+        } else {
             this.inputValeurs = document.getElementById("valeurs");
             this.inputNomAccord = document.getElementById("name");
             this.inputCaseDepart = document.getElementById("caseDepart");
@@ -32,8 +36,6 @@ class DessineDiagrammeUkulele {
                 this.inputValeurs.value, 
                 -1
             );
-        } else {
-            this.penseDiagrammeUkulele = new PenseDiagrammeUkulele("", "0000", -1);
         }
     }
 
@@ -101,6 +103,45 @@ class DessineDiagrammeUkulele {
         }
     }
 
+    // --- New: Method to draw the favorite icon ---
+    drawFavoriteIcon() {
+        if (!this.ctx) return;
+
+        // Use a fixed size relative to the diagram size or a set value
+        const iconSize = this.taille * 0.8; // Size of the star
+        const margin = this.taille * 0.3; // Margin from the edge
+
+        // Position in the top-right corner of the drawing area
+        const x = this.canvas.width - margin - iconSize / 2;
+        const y = margin + iconSize / 2;
+
+        this.ctx.save(); // Save context state
+        this.ctx.beginPath();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(Math.PI / 4); // Rotate for star shape
+
+        // Drawing a simple star shape
+        const numPoints = 5;
+        const outerRadius = iconSize / 2;
+        const innerRadius = iconSize / 4; // For a spikier star
+
+        this.ctx.moveTo(0, -outerRadius);
+        for (let i = 0; i < numPoints * 2; i++) {
+            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+            const angle = Math.PI / numPoints * i - Math.PI / 2; // Start from top
+            this.ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        }
+        this.ctx.closePath();
+
+        this.ctx.fillStyle = 'gold'; // Star color
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'darkgoldenrod'; // Outline color
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+
+        this.ctx.restore(); // Restore context state
+    }
+
     dessineDiagramme() {
         this.blank();
         let caseDepartEffective = this.getCaseDepartEffective();
@@ -127,6 +168,11 @@ class DessineDiagrammeUkulele {
         
         // On écrit le nom sur TOUS les diagrammes (y compris miniatures)
         this.ecritNomAccord(this.penseDiagrammeUkulele.nomAccord);
+
+        // --- Draw favorite icon if this diagram instance is marked as favorite ---
+        if (this.isFavorite) {
+            this.drawFavoriteIcon();
+        }
 
         if (!this.options.isMiniature) {
             const positions = this.penseDiagrammeUkulele.valeurs;
@@ -156,16 +202,17 @@ class DessineDiagrammeUkulele {
         if (analysisDisplay) {
             const isPlayable = this.penseDiagrammeUkulele.estJouable();
             const playableStatus = isPlayable 
-                ? `<span style="color: green">✅ ${window.i18n.t('playable')}</span>` 
-                : `<span style="color: red">❌ ${window.i18n.t('difficult')}</span>`;
+                ? `<span style="color: green">✅ ${globalThis.i18n.t('playable')}</span>` 
+                : `<span style="color: red">❌ ${globalThis.i18n.t('difficult')}</span>`;
 
-            analysisDisplay.innerHTML = `<strong>${window.i18n.t('detectedChord')} ${chordName}</strong> | ${playableStatus}<br/>
+            analysisDisplay.innerHTML = `<strong>${globalThis.i18n.t('detectedChord')} ${chordName}</strong> | ${playableStatus}<br/>
                                         <small>Notes : ${analyzer.getInversions().map(inv => inv.join('-')).join(' | ')}</small>`;
         }
     }
 
     showAlternatives(targetName) {
-        if (this.options.isMiniature) return;
+        // This method is only meant for the main view, not for miniatures themselves
+        if (this.options.isMiniature) return; 
 
         const container = document.getElementById("alternatives-container");
         const title = document.getElementById("alternatives-title");
@@ -180,14 +227,18 @@ class DessineDiagrammeUkulele {
         if (!positions) return;
 
         const fullPositions = positions.filter(pos => !pos.includes('x'));
-        if (fullPositions.length <= 1) return; // Pas besoin de titre s'il n'y a qu'une seule position (l'actuelle)
+        if (fullPositions.length <= 1) return; // Not enough alternatives to show
 
         // Affichage du titre avec le compte
         if (title) {
             title.style.display = "block";
-            const msg = window.i18n.t('alternativesMsg').replace('{n}', fullPositions.length);
+            const msg = globalThis.i18n.t('alternativesMsg').replace('{n}', fullPositions.length);
             title.innerHTML = msg;
         }
+
+        // --- NEW LOGIC: Check favorite status for each position string ---
+        // This assumes that getFavorites() is globally available from diagrammesv2.js
+        const currentFavorites = globalThis.getFavorites ? globalThis.getFavorites() : [];
 
         fullPositions.forEach((pos, index) => {
             const wrapper = document.createElement("div");
@@ -195,7 +246,10 @@ class DessineDiagrammeUkulele {
             wrapper.style.border = "1px solid #ddd";
             wrapper.style.borderRadius = "4px";
             wrapper.style.padding = "2px";
-            wrapper.style.background = (pos === this.inputValeurs.value) ? "#e8f5e9" : "white";
+            
+            // --- NEW: Check if this specific position is a favorite ---
+            const isPosFavorite = currentFavorites.includes(pos);
+            wrapper.style.background = isPosFavorite ? "#e8f5e9" : "white"; // Highlight if favorite
 
             const canvas = document.createElement("canvas");
             canvas.width = 60;
@@ -213,18 +267,31 @@ class DessineDiagrammeUkulele {
                 epaisseurLigne: 1,
                 couleurGrille: "#666",
                 bGrilleTordue: false,
-                isMiniature: true
+                isMiniature: true,
+                // --- NEW: Pass favorite status to the mini diagram instance ---
+                isFavorite: isPosFavorite 
             };
 
             const miniDiag = new DessineDiagrammeUkulele(canvas, miniOptions);
             miniDiag.penseDiagrammeUkulele.setValeursByString(pos);
-            miniDiag.dessineDiagramme();
+            miniDiag.dessineDiagramme(); // This will now call drawFavoriteIcon if isFavorite is true
 
             wrapper.addEventListener("click", () => {
+                // When a mini-diagram is clicked, update the main diagram's input and redraw
                 this.inputValeurs.value = pos;
                 this.penseDiagrammeUkulele.setValeursByString(pos);
                 this.syncPenseToUI();
-                this.dessineDiagramme();
+                this.dessineDiagramme(); // Redraw the main diagram
+
+                // --- NEW: Update favorite status for the main diagram and toggle button ---
+                // After the main diagram is redrawn, its favorite status needs to be reflected.
+                // We call the global update functions to ensure synchronization.
+                if (globalThis.updateMainDiagramFavoriteStatus) {
+                    globalThis.updateMainDiagramFavoriteStatus();
+                }
+                if (globalThis.updateFavoriteIconState) {
+                    globalThis.updateFavoriteIconState();
+                }
             });
         });
     }
@@ -392,6 +459,14 @@ class DessineDiagrammeUkulele {
 
             this.syncPenseToUI();
             this.dessineDiagramme();
+            
+            // --- NEW: Update global favorite status and icon state after drawing ---
+            if (globalThis.updateMainDiagramFavoriteStatus) {
+                globalThis.updateMainDiagramFavoriteStatus();
+            }
+            if (globalThis.updateFavoriteIconState) {
+                globalThis.updateFavoriteIconState();
+            }
         }
     }
 

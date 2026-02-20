@@ -6,52 +6,54 @@
 
 class ChordDataGenerator {
     static generate() {
-        const results = {};
-        const instrument = new Instrument("Ukulele", ['G', 'C', 'E', 'A']);
-        const frets = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        
         console.log("Démarrage de la génération (38 416 combinaisons)...");
-        let count = 0;
-        let playables = 0;
 
-        for (let c1 of frets) {
-            for (let c2 of frets) {
-                for (let c3 of frets) {
-                    for (let c4 of frets) {
-                        count++;
-                        const pos = [c1, c2, c3, c4];
-                        
-                        // 1. Vérifier jouabilité
-                        if (this.isPlayable(pos)) {
-                            playables++;
-                            
-                            // 2. Récupérer les notes
-                            const notes = instrument.getNotesForPosition(pos);
-                            
-                            // 3. Identifier l'accord
-                            const analyzer = new ChordAnalyzer(notes);
-                            const names = analyzer.identifyChord(); // Peut renvoyer "C ou Am7"
-                            
-                            if (names !== "inconnu" && names !== "---") {
-                                const posString = this.formatPos(pos);
-                                
-                                // Gérer les noms multiples (ex: C ou Am7)
-                                names.split(' ou ').forEach(name => {
-                                    if (!results[name]) results[name] = [];
-                                    // Éviter les doublons de positions pour un même nom
-                                    if (!results[name].includes(posString)) {
-                                        results[name].push(posString);
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        const instrument = new Instrument("Ukulele", ['G', 'C', 'E', 'A']);
+        const positions = this.generatePositions();
+        const results = {};
 
-        console.log(`Génération terminée : ${playables} positions jouables trouvées.`);
+        positions
+            .filter(pos => this.isPlayable(pos))
+            .forEach(pos => this.processPosition(pos, instrument, results));
+
+        console.log(`Génération terminée : ${Object.values(results).flat().length} positions jouables trouvées.`);
         return results;
+    }
+
+    // --- Méthodes privées ---
+
+    static generatePositions(frets = Array.from({ length: 13 }, (_, i) => i)) {
+        return frets.flatMap(c1 =>
+            frets.flatMap(c2 =>
+                frets.flatMap(c3 =>
+                    frets.map(c4 => [c1, c2, c3, c4])
+                )
+            )
+        );
+    }
+
+    static processPosition(pos, instrument, results) {
+        const notes = instrument.getNotesForPosition(pos);
+        const names = new ChordAnalyzer(notes).identifyChord();
+
+        if (this.isValidChordName(names)) {
+            this.addToResults(results, pos, names);
+        }
+    }
+
+    static isValidChordName(name) {
+        return name !== "inconnu" && name !== "---";
+    }
+
+    static addToResults(results, pos, names) {
+        const posString = this.formatPos(pos);
+
+        names.split(' ou ').forEach(name => {
+            results[name] ??= [];
+            if (!results[name].includes(posString)) {
+                results[name].push(posString);
+            }
+        });
     }
 
     static isPlayable(pos) {
