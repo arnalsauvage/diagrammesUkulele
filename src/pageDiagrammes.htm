@@ -7,12 +7,18 @@
 </head>
 <body>
 
-<div class="lang-selector">
-    <img src="https://flagcdn.com/w40/fr.png" class="lang-flag" data-lang="fr" alt="Français">
-    <img src="https://flagcdn.com/w40/gb.png" class="lang-flag" data-lang="en" alt="English">
-</div>
+<header class="main-header">
+    <div class="header-logo-container">
+        <img src="https://ateliers.canopee-musique.fr/assets/images/logo-canopee.webp" alt="Logo Canopée" class="header-logo">
+    </div>
+    
+    <h1 data-i18n="title">Atelier Diagrammes Ukulélé</h1>
 
-<h1 data-i18n="title">Atelier Diagrammes Ukulélé</h1>
+    <div class="lang-selector">
+        <img src="https://flagcdn.com/w40/fr.png" class="lang-flag" data-lang="fr" alt="Français">
+        <img src="https://flagcdn.com/w40/gb.png" class="lang-flag" data-lang="en" alt="English">
+    </div>
+</header>
 
 <div class="nav-links">
     <a href="./pageAccords.htm" data-i18n="navToGrid">Aller à la page Grille &rarr;</a>
@@ -21,7 +27,10 @@
 <div class="main-container">
     <!-- Section de gauche : Le Diagramme -->
     <section class="canvas-section">
-        <canvas id="diagramme1" height="330" width="190"></canvas>
+        <div class="canvas-container">
+            <span id="favorite-toggle" class="main-favorite-star" title="">☆</span>
+            <canvas id="diagramme1" height="330" width="190"></canvas>
+        </div>
         
         <!-- Affichage des notes calculées -->
         <div id="string-notes-display" style="display: flex; gap: 15px; margin-top: 10px; font-family: monospace; font-weight: bold; font-size: 1.2rem; background: #eee; padding: 5px 15px; border-radius: 20px;">
@@ -43,7 +52,6 @@
 
         <div class="button-bar">
             <a class="leBouton" id="download" download="ukulele-chord.png" data-i18n="download">Download Image</a>
-            <button class="leBouton secondary" id="button-dessine" data-i18n="refresh">Refresh</button>
         </div>
     </section>
 
@@ -54,10 +62,9 @@
             <h3 data-i18n="chordDefinition">Chord Definition</h3>
             <div class="form-group">
                 <label for="name" data-i18n="name">Name:</label>
-                <input id="name" maxlength="8" name="name" type="text" value="Dm"/>
-                <span id="favorite-toggle" style="cursor: pointer; font-size: 1.2rem; margin-left: 5px;" title="Marquer comme favori">☆</span>
-                <span id="toggle-assistant" style="cursor: pointer; font-size: 1.2rem; margin-left: 5px;" title="Assistant">🪄</span>
+                <input id="name" maxlength="12" name="name" type="text" value="Dm"/>
                 <img alt="info" class="infobulle-icone" height="16" id="loupeChercheAccordParNom" src="./images/petite-info-bulle.png" width="16"/>
+                <img src="./images/cle-de-sol.svg" id="toggle-assistant" style="cursor: pointer; height: 36px; width: auto; margin-left: 10px; vertical-align: middle;" title="Assistant" alt="Assistant">
                 <div class="infobulle-texte" id="aide_nomaccord" style="display: none" data-i18n="helpName">
                 </div>
             </div>
@@ -146,12 +153,25 @@
                     <label for="couleurReperes" data-i18n="markers">Markers:</label>
                     <input id="couleurReperes" type="color" value="#FFBBBB"/>
                 </div>
+
+                <!-- Gestion des palettes personnalisées -->
+                <div class="custom-palettes" style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                    <p style="font-size: 0.8rem; font-weight: bold; margin-bottom: 8px;">Mes Palettes (max 3) :</p>
+                    <div id="palettes-list" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <!-- Les palettes s'afficheront ici -->
+                    </div>
+                    <div class="save-palette-form" id="save-palette-area" style="display: flex; gap: 5px;">
+                        <input type="text" id="new-palette-name" placeholder="Nom de la palette" style="font-size: 0.8rem; padding: 4px; flex: 1;">
+                        <button class="leBouton secondary" id="btn-save-palette" style="font-size: 0.7rem; padding: 5px 10px;">Enregistrer</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 </div>
 
 <!-- Scripts -->
+<script src="./js/config.js"></script>
 <script src="./js/generatedChords.js"></script>
 <script src="./js/NoteUtils.js"></script>
 <script src="./js/Instrument.js"></script>
@@ -161,9 +181,30 @@
 <script src="./js/accords.js"></script>
 <script src="./js/grille.js"></script>
 <script src="./js/couleurOutils.js"></script>
-<script src="./js/PenseDiagrammeUkulele2.js"></script>
+<script src="js/PenseDiagrammeUkulele.js"></script>
 <script src="./js/DessineDiagrammeUkulele.js"></script>
-<script src="./js/diagrammesv3.js"></script>
+<script src="js/diagrammes.js"></script>
+
+<footer>
+    <div class="footer-content">
+        <img src="https://ateliers.canopee-musique.fr/assets/images/logo-canopee.webp" alt="Logo Canopée" class="footer-logo">
+        <p>Canopee Musique </p>
+        <div class="footer-links">
+            <a href="https://canopee-musique.fr" target="_blank">Site web</a> |
+            <a href="http://partoches.canopee-musique.fr" target="_blank">Partoches</a> |
+            <a href="https://ateliers.canopee-musique.fr" target="_blank">Ateliers uku en ligne</a> |
+
+            <a href="https://www.youtube.com/@ArnaudMedina" target="_blank" title="YouTube">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" width="30" height="30" alt="YouTube" style="vertical-align:middle;">
+            </a>
+            |
+            <a href="https://bsky.app/profile/arnaud-ukulele.bsky.social" target="_blank" title="Bluesky">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Bluesky_Logo.svg" width="30" height="30" alt="Bluesky" style="vertical-align:middle;">
+            </a>
+        </div>
+
+    </div>
+</footer>
 
 </body>
 </html>

@@ -1,6 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
     const FAVORITES_STORAGE_KEY = 'ukuleleChordFavorites';
 
+    // --- LOGGING SYSTEM ---
+    const logInteraction = (tag, objectData) => {
+        fetch('./api/log_interaction.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tag: tag,
+                object: objectData
+            })
+        }).catch(err => console.error("Logging error:", err));
+    };
+
+    const getChordFullInfo = () => {
+        const name = document.getElementById("name").value || "unknown";
+        const diagram = globalThis.diagramme;
+        let pos = "0.0.0.0";
+        if (diagram && diagram.penseDiagrammeUkulele && diagram.penseDiagrammeUkulele.valeurs) {
+            // On joint les valeurs du tableau avec des points
+            pos = diagram.penseDiagrammeUkulele.valeurs.map(v => v === -1 ? 'x' : v).join('.');
+        }
+        return `${name}|${pos}`;
+    };
+    // --- END LOGGING SYSTEM ---
+
     globalThis.getFavorites = () => {
         const favoritesJson = localStorage.getItem(FAVORITES_STORAGE_KEY);
         return favoritesJson ? JSON.parse(favoritesJson) : [];
@@ -16,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!favorites.includes(positionString)) {
             favorites.push(positionString);
             saveFavorites(favorites);
+            // Log interaction
+            logInteraction('addFavori', getChordFullInfo());
         }
     };
 
@@ -40,13 +68,19 @@ document.addEventListener("DOMContentLoaded", () => {
     globalThis.updateFavoriteIconState = () => {
         const favoriteToggle = document.getElementById('favorite-toggle');
         const currentPositionStr = getCurrentPositionString();
-        if (favoriteToggle && currentPositionStr) {
-            if (globalThis.isFavorite(currentPositionStr)) {
-                favoriteToggle.textContent = '★';
-                favoriteToggle.style.color = 'gold';
-            } else {
-                favoriteToggle.textContent = '☆';
-                favoriteToggle.style.color = 'inherit';
+        
+        if (favoriteToggle) {
+            // Mise à jour de l'infobulle via i18n
+            favoriteToggle.title = globalThis.i18n.t('favTooltip');
+            
+            if (currentPositionStr) {
+                if (globalThis.isFavorite(currentPositionStr)) {
+                    favoriteToggle.textContent = '★';
+                    favoriteToggle.style.color = 'gold';
+                } else {
+                    favoriteToggle.textContent = '☆';
+                    favoriteToggle.style.color = ''; // On laisse le CSS gérer la couleur par défaut
+                }
             }
         }
     };
@@ -106,11 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
         handleChordUpdate();
     });
 
-    document.getElementById("button-dessine").addEventListener("click", () => {
-        globalThis.diagramme.syncUIToPense(); 
-        handleChordUpdate();
-    });
-
     const checkAuto = document.getElementById("caseDepartAuto");
     const inputCase = document.getElementById("caseDepart");
     const toggleCaseInput = () => {
@@ -151,6 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("download").addEventListener("click", function(e) {
         globalThis.diagramme.download_img(this);
+        // Log interaction
+        logInteraction('download', getChordFullInfo());
     });
 
     // --- FAVORITE TOGGLE ---
@@ -167,6 +198,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 handleChordUpdate();
             }
         });
+    }
+
+    // --- CONFIGURATION ET MODE DEV ---
+    const btnGen = document.getElementById("btnGenerateData");
+    if (btnGen && typeof CONFIG !== 'undefined') {
+        if (CONFIG.ENV === 'prod') {
+            btnGen.style.display = 'none';
+        } else {
+            btnGen.addEventListener("click", () => {
+                const startTime = Date.now();
+                const data = ChordDataGenerator.generate();
+                const duration = (Date.now() - startTime) / 1000;
+                alert(`Génération réussie en ${duration}s ! Le fichier va être téléchargé.`);
+                ChordDataGenerator.saveAsFile(data);
+            });
+        }
     }
 
     // --- PALETTE ET BAGUETTE MAGIQUE (COULEURS ET ASSISTANT) ---
@@ -213,4 +260,89 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAssistantGroup('assistant-roots', 'root');
     setupAssistantGroup('assistant-accidentals', 'accidental');
     setupAssistantGroup('assistant-families', 'family');
+
+    // --- INFOBULLES (AIDE) ---
+    const setupAide = (iconeId, aideId) => {
+        const icone = document.getElementById(iconeId);
+        const aide = document.getElementById(aideId);
+        if (icone && aide) {
+            icone.addEventListener("mouseover", () => aide.style.display = "inline");
+            icone.addEventListener("mouseout", () => aide.style.display = "none");
+        }
+    };
+
+    setupAide("loupeChercheAccordParNom", "aide_nomaccord");
+    setupAide("infobulle", "aide_valeur");
+
+    // --- GESTION DES PALETTES PERSONNALISÉES ---
+    const PALETTES_STORAGE_KEY = 'ukuleleCustomPalettes';
+    const palettesList = document.getElementById('palettes-list');
+    const newPaletteNameInput = document.getElementById('new-palette-name');
+    const btnSavePalette = document.getElementById('btn-save-palette');
+    const saveArea = document.getElementById('save-palette-area');
+
+    const getPalettes = () => {
+        const json = localStorage.getItem(PALETTES_STORAGE_KEY);
+        return json ? JSON.parse(json) : [];
+    };
+
+    const savePalettes = (palettes) => {
+        localStorage.setItem(PALETTES_STORAGE_KEY, JSON.stringify(palettes));
+        renderPalettes();
+    };
+
+    const renderPalettes = () => {
+        const palettes = getPalettes();
+        palettesList.innerHTML = "";
+        
+        palettes.forEach((p, index) => {
+            const chip = document.createElement('div');
+            chip.style.cssText = "background: #eee; border: 1px solid #ccc; padding: 4px 8px; border-radius: 15px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 5px;";
+            chip.innerHTML = `<span>${p.name}</span><span class="delete-p" style="color: red; font-weight: bold; padding: 0 2px;">×</span>`;
+            
+            // Appliquer la palette
+            chip.querySelector('span').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('couleurRemplissage').value = p.fill;
+                document.getElementById('couleurTrait').value = p.stroke;
+                document.getElementById('couleurGrille').value = p.grid;
+                document.getElementById('couleurReperes').value = p.markers;
+                globalThis.diagramme.updateColors();
+                globalThis.diagramme.dessineDiagramme();
+            });
+
+            // Supprimer la palette
+            chip.querySelector('.delete-p').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const updated = getPalettes().filter((_, i) => i !== index);
+                savePalettes(updated);
+            });
+
+            palettesList.appendChild(chip);
+        });
+
+        // Masquer le formulaire si on a déjà 3 palettes
+        saveArea.style.display = (palettes.length >= 3) ? 'none' : 'flex';
+    };
+
+    btnSavePalette.addEventListener('click', () => {
+        const name = newPaletteNameInput.value.trim();
+        if (!name) return;
+
+        const palettes = getPalettes();
+        if (palettes.length >= 3) return;
+
+        palettes.push({
+            name: name,
+            fill: document.getElementById('couleurRemplissage').value,
+            stroke: document.getElementById('couleurTrait').value,
+            grid: document.getElementById('couleurGrille').value,
+            markers: document.getElementById('couleurReperes').value
+        });
+
+        savePalettes(palettes);
+        newPaletteNameInput.value = "";
+    });
+
+    renderPalettes();
 });

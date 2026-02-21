@@ -27,7 +27,8 @@ const translations = {
         alternativesMsg: "Alternatives : découvre {n} positions jouables pour cet accord",
         detectedChord: "Accord détecté :",
         playable: "Jouable",
-        difficult: "Trop difficile"
+        difficult: "Trop difficile",
+        favTooltip: "Enregistrer en favori cette position d'accord"
     },
     en: {
         title: "Ukulele Chord Workshop",
@@ -57,7 +58,8 @@ const translations = {
         alternativesMsg: "Alternatives: discover {n} playable positions for this chord",
         detectedChord: "Detected chord:",
         playable: "Playable",
-        difficult: "Too difficult"
+        difficult: "Too difficult",
+        favTooltip: "Save this chord position as favorite"
     }
 };
 

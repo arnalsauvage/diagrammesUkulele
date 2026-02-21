@@ -286,6 +286,11 @@ class DessineDiagrammeUkulele {
 
             const miniDiag = new DessineDiagrammeUkulele(canvas, miniOptions);
             miniDiag.penseDiagrammeUkulele.setValeursByString(pos);
+            
+            // Calculer et appliquer la case de départ pour le mini-diagramme
+            const caseDep = miniDiag.penseDiagrammeUkulele.calculeCaseDepart();
+            miniDiag.penseDiagrammeUkulele.setCaseDepart(caseDep);
+            
             miniDiag.dessineDiagramme(); // This will now call drawFavoriteIcon if isFavorite is true
 
             wrapper.addEventListener("click", () => {
@@ -354,6 +359,11 @@ class DessineDiagrammeUkulele {
             const miniDiag = new DessineDiagrammeUkulele(canvas, miniOptions);
             miniDiag.penseDiagrammeUkulele.setNomAccord(res.name);
             miniDiag.penseDiagrammeUkulele.setValeursByString(res.position);
+            
+            // Calculer la case de départ effective
+            const caseDep = miniDiag.penseDiagrammeUkulele.calculeCaseDepart();
+            miniDiag.penseDiagrammeUkulele.setCaseDepart(caseDep);
+            
             miniDiag.dessineDiagramme();
 
             wrapper.addEventListener("click", () => {
@@ -543,7 +553,9 @@ class DessineDiagrammeUkulele {
     }
 
     getCaseDepartEffective() {
-        if (this.options.isMiniature) return 1;
+        if (this.options.isMiniature) {
+            return (this.penseDiagrammeUkulele.caseDepart > 0) ? this.penseDiagrammeUkulele.caseDepart : 1;
+        }
         const popup = document.getElementById("popupMessage");
         if (popup) popup.style.display = "none";
         let caseDepart;
