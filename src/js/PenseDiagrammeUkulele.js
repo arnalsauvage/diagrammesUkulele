@@ -9,6 +9,31 @@ export class PenseDiagrammeUkulele {
         this.setValeursByString(valeurs);
     }
 
+    // Table de correspondance pour les équivalents enharmoniques
+    static ENHARMONIQUES = {
+        "A#": "Bb", "Bb": "A#",
+        "C#": "Db", "Db": "C#",
+        "D#": "Eb", "Eb": "D#",
+        "F#": "Gb", "Gb": "F#",
+        "G#": "Ab", "Ab": "G#",
+        "E#": "F",  "Fb": "E",
+        "B#": "C",  "Cb": "B"
+    };
+
+    getEnharmonique(nom) {
+        if (!nom) return null;
+        // On sépare la note de base (+ altération) du reste (m, 7, etc.)
+        let note = nom[0];
+        let reste = nom.slice(1);
+        if (nom.length > 1 && (nom[1] === '#' || nom[1] === 'b')) {
+            note = nom.slice(0, 2);
+            reste = nom.slice(2);
+        }
+        
+        const equiv = PenseDiagrammeUkulele.ENHARMONIQUES[note];
+        return equiv ? equiv + reste : null;
+    }
+
     setValeursByString(maChaine) {
         if (!maChaine) {
             this.valeurs = [0, 0, 0, 0];
@@ -82,7 +107,6 @@ export class PenseDiagrammeUkulele {
         return caseDepart;
     }
 
-    // RECHERCHE CORRIGEE : MATCH EXACT ET TRI DES POSITIONS (ALTERNATIVES)
     chercheAccordParNom(nomAccordQuery, dictionnaire, isFavoriteFn, generatedChords) {
         const nomAccord = nomAccordQuery ? nomAccordQuery.trim() : "";
         if (!nomAccord) {
@@ -91,25 +115,45 @@ export class PenseDiagrammeUkulele {
             return { found: false, results: [] }; 
         }
 
-        const existeDansTableau = !!dictionnaire[nomAccord];
-        const existeDansGenerated = (!!generatedChords && !!generatedChords[nomAccord]);
+        // On cherche le nom exact ou son équivalent enharmonique dans le dictionnaire principal
+        let nomTrouve = null;
+        if (dictionnaire[nomAccord]) {
+            nomTrouve = nomAccord;
+        } else {
+            const enh = this.getEnharmonique(nomAccord);
+            if (enh && dictionnaire[enh]) nomTrouve = enh;
+        }
 
-        if (!existeDansTableau && !existeDansGenerated) {
+        const nomEnharmonique = this.getEnharmonique(nomAccord);
+        
+        // On vérifie les alternatives (match exact ou enharmonique)
+        let positions = [];
+        if (generatedChords) {
+            if (generatedChords[nomAccord]) {
+                positions = [...generatedChords[nomAccord]];
+            } else if (nomEnharmonique && generatedChords[nomEnharmonique]) {
+                positions = [...generatedChords[nomEnharmonique]];
+            }
+        }
+
+        // Si on n'a rien trouvé du tout
+        if (!nomTrouve && positions.length === 0) {
             this.setNomAccord("non répertorié");
             this.valeurs = [0, 0, 0, 0];
             return { found: false, results: [] };
         }
 
-        this.setNomAccord(nomAccord);
+        this.setNomAccord(nomAccord); // On garde le nom saisi par l'utilisateur
 
-        let positions = [];
-        if (existeDansGenerated) {
-            positions = [...generatedChords[nomAccord]].filter(pos => !pos.includes('x'));
-        } else {
-            positions = [dictionnaire[nomAccord]];
+        // Si on n'a pas de variantes mais qu'on a une position dans le dictionnaire
+        if (positions.length === 0 && nomTrouve) {
+            positions = [dictionnaire[nomTrouve]];
         }
 
-        const searchResults = positions.map(pos => ({
+        // Filtrage des positions 'x'
+        const cleanPositions = positions.filter(pos => !pos.includes('x'));
+
+        const searchResults = cleanPositions.map(pos => ({
             name: nomAccord,
             position: pos,
             isFavorite: isFavoriteFn ? isFavoriteFn(pos) : false

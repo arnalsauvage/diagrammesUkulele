@@ -18,4 +18,9 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    root: '.', // Chercher les tests à partir de la racine du projet
+  },
 });

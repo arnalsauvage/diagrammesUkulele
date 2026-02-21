@@ -26,6 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${name}|${pos}`;
     };
 
+    // --- LOGIQUE ACCORD DU JOUR ---
+    const getChordOfTheDay = () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = now - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+        
+        const keys = Object.keys(tableauAccords).sort();
+        const index = dayOfYear % keys.length;
+        return { name: keys[index], pos: tableauAccords[keys[index]] };
+    };
+
     // --- INITIALISATION DU DIAGRAMME ---
     const options = {
         taille: 40, tailleGrillex: 4, tailleGrilley: 6, margeHauteurGrille: 35, margeGaucheGrille: 20, epaisseurLigne: 3, couleurGrille: "#333333", bGrilleTordue: true,
@@ -36,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- MISE À JOUR DE L'UI ---
     const handleChordUpdate = () => {
-        globalThis.diagramme.syncPenseToUI(); // IMPORTANT: Met à jour les champs de texte
+        globalThis.diagramme.syncPenseToUI();
         globalThis.diagramme.dessineDiagramme();
         globalThis.updateMainDiagramFavoriteStatus();
         globalThis.updateFavoriteIconState();
@@ -66,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputValeurs = document.getElementById("valeurs");
     
     const declencheRecherche = () => {
+        if (!inputName) return;
         const result = globalThis.diagramme.penseDiagrammeUkulele.chercheAccordParNom(
             inputName.value, 
             tableauAccords, 
@@ -78,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
         handleChordUpdate();
     };
 
-    inputName.addEventListener("keyup", (e) => { if (e.key === "Enter") declencheRecherche(); });
+    inputName?.addEventListener("keyup", (e) => { if (e.key === "Enter") declencheRecherche(); });
     document.getElementById("loupeChercheAccordParNom")?.addEventListener("click", declencheRecherche);
 
     inputValeurs?.addEventListener("change", (e) => {
@@ -96,19 +110,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("randomChord")?.addEventListener("click", () => {
         globalThis.diagramme.penseDiagrammeUkulele.setAccordAuHasard(tableauAccords);
-        handleChordUpdate(); // Synchro UI d'abord
-        declencheRecherche(); // Puis recherche des alternatives
+        inputName.value = globalThis.diagramme.penseDiagrammeUkulele.nomAccord;
+        declencheRecherche();
     });
 
     document.getElementById("btnPrecChord")?.addEventListener("click", () => {
         globalThis.diagramme.penseDiagrammeUkulele.chercheAccordPrecedent(tableauAccords);
-        handleChordUpdate();
+        inputName.value = globalThis.diagramme.penseDiagrammeUkulele.nomAccord;
         declencheRecherche();
     });
 
     document.getElementById("btnNextChord")?.addEventListener("click", () => {
         globalThis.diagramme.penseDiagrammeUkulele.chercheAccordSuivant(tableauAccords);
-        handleChordUpdate();
+        inputName.value = globalThis.diagramme.penseDiagrammeUkulele.nomAccord;
         declencheRecherche();
     });
 
@@ -143,10 +157,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const initFromURL = () => {
         const params = new URLSearchParams(window.location.search);
-        const chord = params.get('chord'), pos = params.get('pos');
-        if (chord) { inputName.value = chord; globalThis.diagramme.penseDiagrammeUkulele.setNomAccord(chord); }
-        if (pos) { inputValeurs.value = pos; globalThis.diagramme.penseDiagrammeUkulele.setValeursByString(pos); }
-        if (chord || pos) declencheRecherche();
+        let chord = params.get('chord');
+        let pos = params.get('pos');
+        
+        // Si aucun paramètre, on prend l'accord du jour
+        if (!chord && !pos) {
+            const today = getChordOfTheDay();
+            chord = today.name;
+            pos = today.pos;
+        }
+
+        if (chord) { 
+            inputName.value = chord; 
+            globalThis.diagramme.penseDiagrammeUkulele.setNomAccord(chord); 
+        }
+        if (pos) { 
+            if (inputValeurs) inputValeurs.value = pos; 
+            globalThis.diagramme.penseDiagrammeUkulele.setValeursByString(pos); 
+        }
+        
+        // IMPORTANT: Toujours déclencher la recherche initiale
+        declencheRecherche();
     };
 
     // --- ASSISTANT ---
@@ -178,6 +209,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- CONFIGURATION & PALETTES ---
     if (CONFIG.ENV === 'prod') document.getElementById("btnGenerateData")?.remove();
+    
+    // Affichage de la version
+    const versionEl = document.getElementById("app-version");
+    if (versionEl) versionEl.textContent = `v${CONFIG.VERSION}`;
+
     document.getElementById('toggle-assistant')?.addEventListener('click', () => { const el = document.getElementById('chord-assistant'); if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none'; });
     document.getElementById('toggle-colors')?.addEventListener('click', () => { const el = document.getElementById('color-controls'); if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none'; });
 
@@ -207,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initialisation finale
     i18n.init();
-    initFromURL();
+    initFromURL(); // Déclenche la recherche et l'affichage initial
     updateAccidentalAvailability();
     renderPalettes();
 

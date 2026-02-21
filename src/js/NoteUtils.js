@@ -15,8 +15,10 @@ export class NoteUtils {
     }
 
     static getNoteIndex(note) {
-        let index = this.notes.indexOf(note.toUpperCase());
-        if (index === -1) index = this.notesAlt.indexOf(note.toUpperCase());
+        if (!note) return -1;
+        const normalizedNote = note.charAt(0).toUpperCase() + note.slice(1).toLowerCase();
+        let index = this.notes.indexOf(normalizedNote);
+        if (index === -1) index = this.notesAlt.indexOf(normalizedNote);
         return index;
     }
 }

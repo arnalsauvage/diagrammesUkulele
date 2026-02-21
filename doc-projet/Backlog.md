@@ -1,10 +1,12 @@
 # Backlog projet diagrammes ukulélé
 
+### Mettre en place des tests autos Cypress ou Vitest
+
+### Mettre en place des tests unitaires Vitest
+
 ### Gestion des barrés
 Proposer une option de présentation d'une position avec barrés ou sans
 
-### Proposer un lien "partager cet accord"
-Proposer un lien vers le diagramme de l'accord pour pouvoir le partager
 
 ## DOING
 
@@ -86,3 +88,13 @@ fichier config qui indique si on est en dev ou en prod
 ETQ Utilisateur, je peux sauvegarder des palettes de couleurs et leur donner un nom.
 Elles sont stockées dans mon localstorage.
 Je peux me créer jusqu'à 3 palettes, assortiments de réglages de couleur
+
+### Proposer un lien "partager cet accord" 21/02/2026
+Proposer un lien vers le diagramme de l'accord pour pouvoir le partager
+
+### Refacto resolution dette technique build Vite 21/02/2026
+
+
+
+### Afficher l'accord du jour 21/02/2026
+Afficher l'accord du jour dans la page d'accueil
