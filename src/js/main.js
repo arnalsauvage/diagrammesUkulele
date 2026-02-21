@@ -186,8 +186,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const sharpBtn = document.querySelector('#assistant-accidentals .mini-btn[data-val="#"]');
         const flatBtn = document.querySelector('#assistant-accidentals .mini-btn[data-val="b"]');
         const sF = (selection.root === 'B' || selection.root === 'E'), fF = (selection.root === 'F' || selection.root === 'C');
-        if (sharpBtn) { sharpBtn.disabled = sF; sharpBtn.style.opacity = sF ? "0.3" : "1"; sharpBtn.style.pointerEvents = sF ? "none" : "auto"; if (sF && selection.accidental === '#') selection.accidental = ''; }
-        if (flatBtn) { flatBtn.disabled = fF; flatBtn.style.opacity = fF ? "0.3" : "1"; flatBtn.style.pointerEvents = fF ? "none" : "auto"; if (fF && selection.accidental === 'b') selection.accidental = ''; }
+        
+        if (sharpBtn) { 
+            sharpBtn.disabled = sF; // Ajout de l'attribut natif
+            sharpBtn.style.opacity = sF ? "0.3" : "1"; 
+            sharpBtn.style.pointerEvents = sF ? "none" : "auto"; 
+            if (sF && selection.accidental === '#') selection.accidental = ''; 
+        }
+        
+        if (flatBtn) { 
+            flatBtn.disabled = fF; // Ajout de l'attribut natif
+            flatBtn.style.opacity = fF ? "0.3" : "1"; 
+            flatBtn.style.pointerEvents = fF ? "none" : "auto"; 
+            if (fF && selection.accidental === 'b') selection.accidental = ''; 
+        }
         document.querySelectorAll('#assistant-accidentals .mini-btn').forEach(btn => btn.classList.remove('active'));
         const activeBtn = document.querySelector(`#assistant-accidentals .mini-btn[data-val="${selection.accidental}"]`);
         if (activeBtn) activeBtn.classList.add('active');
