@@ -22,5 +22,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     root: '.', // Chercher les tests à partir de la racine du projet
+    exclude: ['**/node_modules/**', '**/tests-e2e/**'],
   },
 });

@@ -2,44 +2,18 @@
 <html lang="fr">
 <head>
     <title>Grille d'accords Ukulélé</title>
+    <meta name="description" content="Créez vos grilles d'accords de ukulélé personnalisées en quelques clics. Un outil pratique et rapide proposé par l'association musicale Canopée.">
     <meta charset="utf-8" />
     <link rel="icon" type="image/webp" href="https://ateliers.canopee-musique.fr/assets/images/logo-canopee.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="style.css" rel="stylesheet" />
-    <style>
-        .grid-controls {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        #accordsSaisis {
-            width: 100%;
-            max-width: 600px;
-            height: 80px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #listeAccords {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-    </style>
 </head>
 <body>
     <div class="lang-selector">
-        <img src="https://flagcdn.com/w40/fr.png" class="lang-flag" data-lang="fr" alt="Français">
-        <img src="https://flagcdn.com/w40/gb.png" class="lang-flag" data-lang="en" alt="English">
+        <img src="./images/fr.png" class="lang-flag" data-lang="fr" alt="Français">
+        <img src="./images/gb.png" class="lang-flag" data-lang="en" alt="English">
     </div>
 
     <h1 data-i18n="generatorTitle">Générateur de Grille d'Accords</h1>
@@ -48,7 +22,7 @@
         <a href="index.html" data-i18n="navToAtelier">&larr; Retour à l'atelier</a>
     </div>
 
-    <div class="main-container" style="display: block">
+    <main class="main-container grid-page">
         <div class="grid-controls">
             <p data-i18n="inputPlaceholder">Saisissez vos accords séparés par des espaces :</p>
             <textarea id="accordsSaisis">C C#dim7 Dm7 G7</textarea>
@@ -56,7 +30,7 @@
         </div>
 
         <div id="listeAccords"></div>
-    </div>
+    </main>
 
     <!-- Scripts -->
     <script type="module" src="./js/pageAccords.js"></script>
@@ -81,7 +55,7 @@
         </div>
 
         <div class="footer-legal">
-            <span id="app-version" style="font-weight: bold; color: var(--primary-color);"></span>
+            <span id="app-version"></span>
             <a href="#" target="_blank">Mentions légales</a>
             <a href="#" target="_blank">Mercis</a>
         </div>

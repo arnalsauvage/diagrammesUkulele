@@ -14,7 +14,6 @@ export class Grille {
   }
 
   dessineGrille() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const maxCasesVerticales = this.options.tailleGrilley;
     const maxCasesHorizontales = this.options.tailleGrillex;
 

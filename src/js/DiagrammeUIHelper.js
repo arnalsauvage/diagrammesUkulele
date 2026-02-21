@@ -9,13 +9,28 @@ export class DiagrammeUIHelper {
      */
     static createThumbnail(container, data, onClick) {
         const wrapper = document.createElement("div");
-        wrapper.className = "diagram-thumbnail"; // Utiliser une classe CSS pour le style
+        wrapper.className = "diagram-thumbnail"; 
         wrapper.style.cursor = "pointer";
         wrapper.style.border = "1px solid #ddd";
         wrapper.style.borderRadius = "4px";
         wrapper.style.padding = "2px";
+        wrapper.style.position = "relative"; // Nécessaire pour le positionnement de l'étoile
         wrapper.style.background = data.isFavorite ? "#fff9c4" : "white";
         if (data.isFavorite) wrapper.style.borderColor = "gold";
+
+        // Ajout de l'étoile HTML par-dessus si favori
+        if (data.isFavorite) {
+            const star = document.createElement("span");
+            star.textContent = "★";
+            star.style.position = "absolute";
+            star.style.top = "-2px";
+            star.style.left = "2px";
+            star.style.color = "gold";
+            star.style.fontSize = "1rem";
+            star.style.zIndex = "5";
+            star.style.textShadow = "0 1px 2px rgba(0,0,0,0.3)";
+            wrapper.appendChild(star);
+        }
 
         const canvas = document.createElement("canvas");
         canvas.width = 60;

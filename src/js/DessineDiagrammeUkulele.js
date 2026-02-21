@@ -72,7 +72,7 @@ export class DessineDiagrammeUkulele {
     }
 
     blank() {
-        this.ctx.fillStyle = this.couleurOutils.couleurFond;
+        this.ctx.fillStyle = "#FFFFFF"; // Fond blanc opaque pour le téléchargement
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
@@ -127,7 +127,6 @@ export class DessineDiagrammeUkulele {
         this.ctx.lineWidth = this.grille.options.epaisseurLigne;
         this.metLesDoigts(caseDepartEffective);
         this.ecritNomAccord(this.penseDiagrammeUkulele.nomAccord);
-        if (this.isFavorite) this.drawFavoriteIcon();
 
         if (!this.options.isMiniature) {
             const notes = UkuleleGCEA.getNotesForPosition(this.penseDiagrammeUkulele.valeurs);
@@ -147,10 +146,14 @@ export class DessineDiagrammeUkulele {
     updateAnalysisUI(chordName, analyzer) {
         const display = document.getElementById("chord-analysis-display");
         if (display) {
-            const status = this.penseDiagrammeUkulele.estJouable() 
-                ? `<span style="color: green">✅ ${i18n.t('playable')}</span>` 
-                : `<span style="color: red">❌ ${i18n.t('difficult')}</span>`;
-            display.innerHTML = `<strong>${i18n.t('detectedChord')} ${chordName}</strong> | ${status}<br/>
+            const isPlayable = this.penseDiagrammeUkulele.estJouable();
+            const statusClass = isPlayable ? "status-playable" : "status-difficult";
+            const icon = isPlayable ? "✅" : "❌";
+            const label = isPlayable ? i18n.t('playable') : i18n.t('difficult');
+            
+            const statusHtml = `<span class="${statusClass}">${icon} ${label}</span>`;
+
+            display.innerHTML = `<strong>${i18n.t('detectedChord')} ${chordName}</strong> | ${statusHtml}<br/>
                                  <small>Notes : ${analyzer.getInversions().map(inv => inv.join('-')).join(' | ')}</small>`;
         }
     }
@@ -251,10 +254,19 @@ export class DessineDiagrammeUkulele {
     metLesDoigts(caseDepart) {
         if (caseDepart > 1) {
             this.ctx.beginPath();
-            this.ctx.font = `bold ${this.taille / 1.8}px Verdana, Arial, serif`;
-            this.ctx.fillStyle = this.couleurOutils.couleurTrait; this.ctx.textAlign = "right"; 
-            this.ctx.fillText(caseDepart.toString(), this.grille.options.margeGaucheGrille - (0.25 * this.taille), this.grille.options.margeHauteurGrille + 0.7 * this.taille);
-            this.ctx.stroke(); this.ctx.textAlign = "left"; 
+            // Réduction de taille si 2 chiffres
+            const fontSize = caseDepart > 9 ? this.taille / 2.2 : this.taille / 1.8;
+            this.ctx.font = `bold ${fontSize}px 'Montserrat', sans-serif`;
+            this.ctx.fillStyle = this.couleurOutils.couleurTrait;
+            this.ctx.textAlign = "right"; 
+            
+            // Décalage optimisé vers la droite et le haut si 2 chiffres
+            let xPos = this.grille.options.margeGaucheGrille - (caseDepart > 9 ? 0.1 * this.taille : 0.25 * this.taille);
+            let yPos = this.grille.options.margeHauteurGrille + (caseDepart > 9 ? 0.6 * this.taille : 0.7 * this.taille);
+            
+            this.ctx.fillText(caseDepart.toString(), xPos, yPos);
+            this.ctx.stroke();
+            this.ctx.textAlign = "left"; 
         }
         for (let corde = 0; corde < CORDES_MAX; corde++) {
             const v = this.penseDiagrammeUkulele.getValeurCorde(corde);
@@ -288,13 +300,13 @@ export class DessineDiagrammeUkulele {
         let tonale = nomAccord[0], alt = "", suffixe = nomAccord.slice(1);
         if (nomAccord.length > 1 && (nomAccord[1] === '#' || nomAccord[1] === 'b')) { alt = nomAccord[1]; suffixe = nomAccord.slice(2); }
         this.ctx.fillStyle = this.couleurOutils.couleurTrait; this.ctx.textAlign = "left"; this.ctx.textBaseline = "ideographic";
-        this.ctx.font = `bold ${this.taille}px Verdana, Arial, serif`; let wT = this.ctx.measureText(tonale).width;
-        this.ctx.font = `bold ${this.taille * 0.75}px Verdana, Arial, serif`; let wA = alt ? this.ctx.measureText(alt).width : 0;
-        this.ctx.font = `bold ${this.taille * 0.6}px Verdana, Arial, serif`; let wS = this.ctx.measureText(suffixe).width;
+        this.ctx.font = `bold ${this.taille}px 'Montserrat', sans-serif`; let wT = this.ctx.measureText(tonale).width;
+        this.ctx.font = `bold ${this.taille * 0.75}px 'Montserrat', sans-serif`; let wA = alt ? this.ctx.measureText(alt).width : 0;
+        this.ctx.font = `bold ${this.taille * 0.6}px 'Montserrat', sans-serif`; let wS = this.ctx.measureText(suffixe).width;
         let x = (this.canvas.width / 2) - ((wT + wA + wS) / 2), y = this.taille;
-        this.ctx.font = `bold ${this.taille}px Verdana, Arial, serif`; this.ctx.fillText(tonale, x, y);
-        if (alt) { this.ctx.font = `bold ${this.taille * 0.75}px Verdana, Arial, serif`; this.ctx.fillText(alt, x + wT, y * 0.95); }
-        this.ctx.font = `bold ${this.taille * 0.6}px Verdana, Arial, serif`; this.ctx.fillText(suffixe, x + wT + wA, y);
+        this.ctx.font = `bold ${this.taille}px 'Montserrat', sans-serif`; this.ctx.fillText(tonale, x, y);
+        if (alt) { this.ctx.font = `bold ${this.taille * 0.75}px 'Montserrat', sans-serif`; this.ctx.fillText(alt, x + wT, y * 0.95); }
+        this.ctx.font = `bold ${this.taille * 0.6}px 'Montserrat', sans-serif`; this.ctx.fillText(suffixe, x + wT + wA, y);
     }
 
     clicSurDiagramme(event) {

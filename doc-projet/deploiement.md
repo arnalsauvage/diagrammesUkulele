@@ -4,6 +4,12 @@ Ce document explique comment générer la version de production de l'application
 
 ## 🚀 Étape 1 : Préparation locale
 
+On lance l'appli en locale pendant le dev avec : 
+
+    ```powershell
+    npm run dev
+    ```
+
 Avant d'envoyer les fichiers, vous devez "compiler" l'application pour qu'elle soit optimisée.
 
 1.  Ouvrez un terminal à la racine du projet.
