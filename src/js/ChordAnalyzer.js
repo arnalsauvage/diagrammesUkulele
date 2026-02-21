@@ -1,4 +1,6 @@
-class ChordAnalyzer {
+import { NoteUtils } from './NoteUtils.js';
+
+export class ChordAnalyzer {
     // Bibliothèque des types d'accords (intervalles en demi-tons par rapport à la fondamentale)
     static formulas = {
         "": [0, 4, 7],          // Majeur

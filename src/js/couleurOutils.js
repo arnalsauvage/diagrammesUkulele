@@ -1,5 +1,5 @@
 // Classe pour gérer les couleurs des outils
-class CouleurOutils {
+export class CouleurOutils {
 
   updateColors(
       couleurRemplissage,

@@ -3,8 +3,17 @@
 ### Gestion des barrés
 Proposer une option de présentation d'une position avec barrés ou sans
 
+### Proposer un lien "partager cet accord"
+Proposer un lien vers le diagramme de l'accord pour pouvoir le partager
+
 ## DOING
 
+### Passage à Vite & Modules ES
+**En tant que** développeur, **je veux** utiliser un outil de build moderne et une structure de modules, **afin de** supprimer la pollution de l'espace global, gérer les dépendances proprement et optimiser l'application (minification).
+*   **Action** : Initialiser npm, installer Vite.js.
+*   **Refacto** : Convertir les fichiers JS en modules ES (`export`/`import`).
+*   **Nettoyage** : Supprimer l'usage abusif de `globalThis`.
+*   **Entrée** : Créer un point d'entrée unique (`main.js`).
 
 ## DONE
 
@@ -17,22 +26,16 @@ Proposer une option de présentation d'une position avec barrés ou sans
   juste l'accord... Exemple on met en favori la position 2120 pour le F#m du coup, parmi
   toutes les positions possibles poue un F#m la  2120 est notée en favorite
 
-
 ### Responsive 20/02/2026
 la page doit se recharger dès qu'un point est modifié sur le diagramme.
 si la recherche identifie un accord, son nom est modifié pour correspondre
-
 
 ### palette de la page 21/02/2026
   en tant qu'asso Canopée, je veux que la palette de la page soit conforme à mes couleurs, comme dans l'image
   doc-projet\palette-canopee.png
 
-
-
-
 ### pied de page 21/02/2026
   ETQ Canopée je veux mettre en avant mes sites dans le bas de page :
-
 
 ```html
 <div class="starter-template">
@@ -67,7 +70,6 @@ Il faudrait les afficher à la bonne frette : la première frette jouée
 
 ### Ui 
 
-
 #### supprimer le bouton actualiser 21/02/2026
 On peut supprimer le  bouton "Actualiser" car l'appli s'actualise toute seule maintenant !
 
@@ -79,7 +81,6 @@ fichier config qui indique si on est en dev ou en prod
 - On a perdu les bulles d'aide pour les champs de recherche ? Elles ne s'affichent plus
 - les zones de saisie pour les noms des accords sont trop longues, 12 caractères max serait mieux
 - pareil pour les noms des positions
-
 
 ### mes palettes 21/02/2026
 ETQ Utilisateur, je peux sauvegarder des palettes de couleurs et leur donner un nom.

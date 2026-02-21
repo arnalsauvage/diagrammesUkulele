@@ -1,16 +1,6 @@
-const tableauAccords = {};
-
-// À faire : 5 familles à renseigner, les accords mineurs Majeur7 mMaj7,
-//  Les accords majeurs avec quinte diminuée b5,les accords Majeurs 7 de quinte diminuée  maj7(5b)
-// Les accords de sixte /neuvième 6/9, Les accords de neuvième 9,
-
-// Fait  : 14 familles renseignées maj min maj7 min7 7M sus2 sus4 aug aug7 dim dim7 5 6 m6 - 168 accords
-// Accords de base : maj, min, maj7, min7, 7M 
-// Accords supplémentaires : sus2, sus4, dim7, 6, m6,
-// Accords supplémentaires : aug, aug7, dim, 5
+export const tableauAccords = {};
 
 // Accords majeurs
-
 tableauAccords["C"] = "0003";
 tableauAccords["C#"] = "1114";
 tableauAccords["Db"] = "1114";
@@ -30,7 +20,6 @@ tableauAccords["Bb"] = "3211";
 tableauAccords["B"] = "4322";
 
 // Accords mineurs
-
 tableauAccords["Cm"] = "0333";
 tableauAccords["C#m"] = "1104";
 tableauAccords["Dbm"] = "1104";
@@ -50,7 +39,6 @@ tableauAccords["Bbm"] = "3111";
 tableauAccords["Bm"] = "4222";
 
 // Accords de 7è
-
 tableauAccords["C7"] = "0001";
 tableauAccords["C#7"] = "1112";
 tableauAccords["Db7"] = "1112";
@@ -70,7 +58,6 @@ tableauAccords["Bb7"] = "1211";
 tableauAccords["B7"] = "2322";
 
 // Accords mineurs 7
-
 tableauAccords["Cm7"] = "3333";
 tableauAccords["C#m7"] = "1102";
 tableauAccords["Dbm7"] = "1102";
@@ -90,7 +77,6 @@ tableauAccords["Bbm7"] = "1111";
 tableauAccords["Bm7"] = "2222";
 
 // Accords mineurs 7M
-
 tableauAccords["Cm7M"] = "4333";
 tableauAccords["C#m7M"] = "1103";
 tableauAccords["Dbm7M"] = "1103";
@@ -110,7 +96,6 @@ tableauAccords["Bbm7M"] = "2111";
 tableauAccords["Bm7M"] = "3222";
 
 // Accords 7è majeure
-
 tableauAccords["C7M"] = "0002";
 tableauAccords["C#7M"] = "1113";
 tableauAccords["Db7M"] = "1113";
@@ -130,7 +115,6 @@ tableauAccords["Bb7M"] = "3210";
 tableauAccords["B7M"] = "4321";
 
 // Accords 5 Power chords
-
 tableauAccords["C5"] = "0033";
 tableauAccords["C#5"] = "1144";
 tableauAccords["Db5"] = "1144";
@@ -169,7 +153,6 @@ tableauAccords["Bbdim"] = "3101";
 tableauAccords["Bdim"] = "4212";
 
 // Accords dim7
-// Il n'y en a que 3 !
 tableauAccords["Cdim7"] = "2323";
 tableauAccords["C#dim7"] = "0101";
 tableauAccords["Dbdim7"] = "0101";
@@ -189,7 +172,6 @@ tableauAccords["Bbdim7"] = "0101";
 tableauAccords["Bdim7"] = "1212";
 
 // Accords 5è augmentée
-// Caug = Eaug = G#Aug ==> il n'y en n'a que 4 !
 tableauAccords["Caug"] = "1003";
 tableauAccords["C#aug"] = "2110";
 tableauAccords["Dbaug"] = "2110";

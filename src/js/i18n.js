@@ -28,7 +28,10 @@ const translations = {
         detectedChord: "Accord détecté :",
         playable: "Jouable",
         difficult: "Trop difficile",
-        favTooltip: "Enregistrer en favori cette position d'accord"
+        favTooltip: "Enregistrer en favori cette position d'accord",
+        share: "Partager",
+        shareSuccess: "Lien de l'accord copié !",
+        shareTooltip: "Copier le lien de cet accord"
     },
     en: {
         title: "Ukulele Chord Workshop",
@@ -59,16 +62,17 @@ const translations = {
         detectedChord: "Detected chord:",
         playable: "Playable",
         difficult: "Too difficult",
-        favTooltip: "Save this chord position as favorite"
+        favTooltip: "Save this chord position as favorite",
+        share: "Share",
+        shareSuccess: "Chord link copied!",
+        shareTooltip: "Copy link for this chord"
     }
 };
 
-class I18n {
+export class I18n {
     constructor() {
-        // Détection de la langue : priorité au localStorage, puis navigateur, sinon 'fr' par défaut
         this.lang = localStorage.getItem('lang') || 
                     (navigator.language.startsWith('fr') ? 'fr' : 'en');
-        this.updateFlags();
     }
 
     setLang(lang) {
@@ -83,7 +87,6 @@ class I18n {
     }
 
     translatePage() {
-        // On cherche tous les éléments avec un attribut data-i18n
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (el.tagName === 'INPUT' && el.type === 'button') {
@@ -95,10 +98,8 @@ class I18n {
             }
         });
         
-        // Cas particulier pour les placeholders ou autres attributs
         const inputAccords = document.getElementById('accordsSaisis');
         if (inputAccords) {
-            // Si c'est une aide au dessus, on change le texte
             const label = inputAccords.previousElementSibling;
             if (label && label.tagName === 'P') label.innerHTML = this.t('inputPlaceholder');
         }
@@ -111,17 +112,16 @@ class I18n {
             el.style.border = el.getAttribute('data-lang') === this.lang ? '2px solid var(--primary-color)' : 'none';
         });
     }
+
+    init() {
+        this.translatePage();
+        this.updateFlags();
+        document.querySelectorAll('.lang-flag').forEach(flag => {
+            flag.addEventListener('click', () => {
+                this.setLang(flag.getAttribute('data-lang'));
+            });
+        });
+    }
 }
 
-globalThis.i18n = new I18n();
-
-document.addEventListener("DOMContentLoaded", () => {
-    globalThis.i18n.translatePage();
-    
-    // Ajout des écouteurs sur les drapeaux (s'ils existent)
-    document.querySelectorAll('.lang-flag').forEach(flag => {
-        flag.addEventListener('click', () => {
-            globalThis.i18n.setLang(flag.getAttribute('data-lang'));
-        });
-    });
-});
+export const i18n = new I18n();

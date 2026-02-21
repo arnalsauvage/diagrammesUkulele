@@ -1,6 +1,5 @@
-
 // Classe pour gérer la grille du diagramme
-class Grille {
+export class Grille {
   constructor(canvas, taille, options) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
@@ -115,6 +114,3 @@ class Grille {
   }
 
 }
-
-// Exporter les classes en tant qu'objet
-// export default Grille;

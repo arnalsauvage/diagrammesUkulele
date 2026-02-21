@@ -1,4 +1,4 @@
-class NoteUtils {
+export class NoteUtils {
     static notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     
     // Pour l'affichage plus "propre" (avec bémols si nécessaire plus tard)

@@ -1,7 +1,7 @@
 const CASE_MAX = 12;
 const CORDES_MAX = 4;
 
-class PenseDiagrammeUkulele {
+export class PenseDiagrammeUkulele {
     constructor(nomAccord, valeurs, caseDepart) {
         this.valeurs = [0, 0, 0, 0];
         this.setCaseDepart(caseDepart);
@@ -83,7 +83,7 @@ class PenseDiagrammeUkulele {
     }
 
     // RECHERCHE CORRIGEE : MATCH EXACT ET TRI DES POSITIONS (ALTERNATIVES)
-    chercheAccordParNom(nomAccordQuery, dictionnaire = tableauAccords) {
+    chercheAccordParNom(nomAccordQuery, dictionnaire, isFavoriteFn, generatedChords) {
         const nomAccord = nomAccordQuery ? nomAccordQuery.trim() : "";
         if (!nomAccord) {
             this.setNomAccord("");
@@ -91,9 +91,8 @@ class PenseDiagrammeUkulele {
             return { found: false, results: [] }; 
         }
 
-        // On vérifie si l'accord existe (match exact uniquement)
         const existeDansTableau = !!dictionnaire[nomAccord];
-        const existeDansGenerated = (typeof generatedChords !== 'undefined' && !!generatedChords[nomAccord]);
+        const existeDansGenerated = (!!generatedChords && !!generatedChords[nomAccord]);
 
         if (!existeDansTableau && !existeDansGenerated) {
             this.setNomAccord("non répertorié");
@@ -103,31 +102,25 @@ class PenseDiagrammeUkulele {
 
         this.setNomAccord(nomAccord);
 
-        // On récupère TOUTES les positions alternatives pour cet accord exact
         let positions = [];
         if (existeDansGenerated) {
-            // On filtre les positions invalides (contenant 'x') si nécessaire, 
-            // ou on prend tout comme dans showAlternatives
             positions = [...generatedChords[nomAccord]].filter(pos => !pos.includes('x'));
         } else {
             positions = [dictionnaire[nomAccord]];
         }
 
-        // On crée les objets de résultats pour le tri
         const searchResults = positions.map(pos => ({
             name: nomAccord,
             position: pos,
-            isFavorite: globalThis.isFavorite ? globalThis.isFavorite(pos) : false
+            isFavorite: isFavoriteFn ? isFavoriteFn(pos) : false
         }));
 
-        // TRI : Les positions favorites de cet accord en premier
         searchResults.sort((a, b) => {
             if (a.isFavorite && !b.isFavorite) return -1;
             if (!a.isFavorite && b.isFavorite) return 1;
-            return 0; // On garde l'ordre de difficulté original pour le reste
+            return 0;
         });
 
-        // On sélectionne la première position (éventuellement la favorite) pour l'affichage principal
         if (searchResults.length > 0) {
             this.setValeursByString(searchResults[0].position);
         }
@@ -135,14 +128,14 @@ class PenseDiagrammeUkulele {
         return { found: true, results: searchResults };
     }
 
-    chercheAccordSuivant(dictionnaire = tableauAccords) {
+    chercheAccordSuivant(dictionnaire) {
         const keys = Object.keys(dictionnaire).sort();
         let index = keys.indexOf(this.nomAccord);
         index = (index + 1) % keys.length;
         this.chercheAccordParNom(keys[index], dictionnaire);
     }
 
-    chercheAccordPrecedent(dictionnaire = tableauAccords) {
+    chercheAccordPrecedent(dictionnaire) {
         const keys = Object.keys(dictionnaire).sort();
         let index = keys.indexOf(this.nomAccord);
         if (index <= 0) index = keys.length - 1;
@@ -150,7 +143,7 @@ class PenseDiagrammeUkulele {
         this.chercheAccordParNom(keys[index], dictionnaire);
     }
 
-    chercheAccordParPosition(sPosition, dictionnaire = tableauAccords) {
+    chercheAccordParPosition(sPosition, dictionnaire) {
         this.setNomAccord("non répertorié");
         for (const name in dictionnaire) {
             if (dictionnaire[name] === sPosition) {
@@ -160,7 +153,7 @@ class PenseDiagrammeUkulele {
         }
     }
 
-    setAccordAuHasard(dictionnaire = tableauAccords) {
+    setAccordAuHasard(dictionnaire) {
         const accords = Object.keys(dictionnaire);
         const numeroAccord = Math.floor(Math.random() * accords.length);
         this.chercheAccordParNom(accords[numeroAccord], dictionnaire);

@@ -1,16 +1,26 @@
+import { DessineDiagrammeUkulele } from './DessineDiagrammeUkulele.js';
+import { tableauAccords } from './accords.js';
+import { i18n } from './i18n.js';
+import { CONFIG } from './config.js';
+
 document.addEventListener("DOMContentLoaded", () => {
+    i18n.init();
+    
+    const versionEl = document.getElementById("app-version");
+    if (versionEl) versionEl.textContent = `v${CONFIG.VERSION}`;
+    
     const input = document.getElementById("accordsSaisis");
     const button = document.getElementById("btnMajAccords");
     const container = document.getElementById("listeAccords");
 
     const renderAccords = () => {
         container.innerHTML = "";
+        if (!input.value) return;
         const accordsSaisis = input.value.trim().split(/\s+/);
         
-        accordsSaisis.forEach((nom, index) => {
+        accordsSaisis.forEach((nom) => {
             if (!nom) return;
 
-            // Créer un wrapper pour le style
             const wrapper = document.createElement("div");
             wrapper.style.display = "inline-block";
             wrapper.style.margin = "10px";
@@ -23,9 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
             wrapper.appendChild(canvas);
             container.appendChild(wrapper);
 
-            // Utiliser la classe avec une taille fixe pour la grille
             const options = {
-                taille: 30, // Un peu plus grand pour la lisibilité
+                taille: 30,
                 tailleGrillex: 4,
                 tailleGrilley: 6,
                 isMiniature: true,
@@ -34,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const diag = new DessineDiagrammeUkulele(canvas, options);
             
-            // Chercher la position et dessiner
             const pos = tableauAccords[nom] || "0000";
             diag.penseDiagrammeUkulele.setNomAccord(nom);
             diag.penseDiagrammeUkulele.setValeursByString(pos);
@@ -42,6 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    button.addEventListener("click", renderAccords);
+    if (button) button.addEventListener("click", renderAccords);
     renderAccords();
 });

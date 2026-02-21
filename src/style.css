@@ -236,6 +236,34 @@ h1 {
   opacity: 1 !important;
 }
 
+/* --- TOAST NOTIFICATIONS --- */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  background: #2c1b0e;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px; /* Plus carré pour le coin */
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .chord-assistant {
   background: #f9f9f9;
   padding: 10px;

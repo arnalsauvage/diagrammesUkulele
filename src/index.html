@@ -3,6 +3,7 @@
 <head>
     <title>Atelier Diagrammes Ukulélé</title>
     <meta charset="utf-8"/>
+    <link rel="icon" type="image/webp" href="https://ateliers.canopee-musique.fr/assets/images/logo-canopee.webp">
     <link href="./style.css" rel="stylesheet"/>
 </head>
 <body>
@@ -21,7 +22,7 @@
 </header>
 
 <div class="nav-links">
-    <a href="./pageAccords.htm" data-i18n="navToGrid">Aller à la page Grille &rarr;</a>
+    <a href="./accords.html" data-i18n="navToGrid">Aller à la page Grille &rarr;</a>
 </div>
 
 <div class="main-container">
@@ -52,6 +53,7 @@
 
         <div class="button-bar">
             <a class="leBouton" id="download" download="ukulele-chord.png" data-i18n="download">Download Image</a>
+            <button class="leBouton secondary" id="btn-share" data-i18n="share">🔗 Partager</button>
         </div>
     </section>
 
@@ -171,19 +173,8 @@
 </div>
 
 <!-- Scripts -->
-<script src="./js/config.js"></script>
 <script src="./js/generatedChords.js"></script>
-<script src="./js/NoteUtils.js"></script>
-<script src="./js/Instrument.js"></script>
-<script src="./js/ChordAnalyzer.js"></script>
-<script src="./js/GenerateChordData.js"></script>
-<script src="./js/i18n.js"></script>
-<script src="./js/accords.js"></script>
-<script src="./js/grille.js"></script>
-<script src="./js/couleurOutils.js"></script>
-<script src="js/PenseDiagrammeUkulele.js"></script>
-<script src="./js/DessineDiagrammeUkulele.js"></script>
-<script src="js/diagrammes.js"></script>
+<script type="module" src="./js/main.js"></script>
 
 <footer>
     <div class="footer-content">
@@ -203,6 +194,11 @@
             </a>
         </div>
 
+        <div class="footer-legal">
+            <span id="app-version" style="display:block; margin-bottom: 10px; font-weight: bold; color: var(--primary-color);"></span>
+            <a href="#" target="_blank">Mentions légales</a> |
+            <a href="#" target="_blank">Mercis</a>
+        </div>
     </div>
 </footer>
 

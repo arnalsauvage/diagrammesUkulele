@@ -1,4 +1,6 @@
-class Instrument {
+import { NoteUtils } from './NoteUtils.js';
+
+export class Instrument {
     constructor(nom, cordes) {
         this.nom = nom;
         this.cordes = cordes; // Tableau de notes de base, ex: ['G', 'C', 'E', 'A']
@@ -14,4 +16,4 @@ class Instrument {
 }
 
 // Instance par défaut pour le Ukulélé
-const UkuleleGCEA = new Instrument("Ukulélé GCEA", ['G', 'C', 'E', 'A']);
+export const UkuleleGCEA = new Instrument("Ukulélé GCEA", ['G', 'C', 'E', 'A']);

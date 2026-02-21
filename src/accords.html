@@ -3,6 +3,7 @@
 <head>
     <title>Grille d'accords Ukulélé</title>
     <meta charset="utf-8" />
+    <link rel="icon" type="image/webp" href="https://ateliers.canopee-musique.fr/assets/images/logo-canopee.webp">
     <link href="style.css" rel="stylesheet" />
     <style>
         .grid-controls {
@@ -44,7 +45,7 @@
     <h1 data-i18n="generatorTitle">Générateur de Grille d'Accords</h1>
     
     <div class="nav-links">
-        <a href="pageDiagrammes.htm" data-i18n="navToAtelier">&larr; Retour à l'atelier</a>
+        <a href="index.html" data-i18n="navToAtelier">&larr; Retour à l'atelier</a>
     </div>
 
     <div class="main-container" style="display: block">
@@ -58,16 +59,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="./js/NoteUtils.js"></script>
-    <script src="./js/Instrument.js"></script>
-    <script src="./js/ChordAnalyzer.js"></script>
-    <script src="./js/i18n.js"></script>
-    <script src="./js/accords.js"></script>
-    <script src="./js/grille.js"></script>
-    <script src="./js/couleurOutils.js"></script>
-    <script src="js/PenseDiagrammeUkulele.js"></script>
-    <script src="./js/DessineDiagrammeUkulele.js"></script>
-    <script src="./js/pageAccords.js"></script>
+    <script type="module" src="./js/pageAccords.js"></script>
 
 <footer>
     <div class="footer-content">
@@ -90,6 +82,7 @@
         </div>
 
         <div class="footer-legal">
+            <span id="app-version" style="display:block; margin-bottom: 10px; font-weight: bold; color: var(--primary-color);"></span>
             <a href="#" target="_blank">Mentions légales</a> |
             <a href="#" target="_blank">Mercis</a>
         </div>
