@@ -1,4 +1,4 @@
-const generatedChords = {
+export const generatedChords = {
   "C6": [
     "0000",
     "0.0.0.12",
